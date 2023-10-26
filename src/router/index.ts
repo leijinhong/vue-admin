@@ -1,5 +1,3 @@
-console.log(123123);
-
 // import "@/utils/sso";
 import { getConfig } from "@/config";
 import NProgress from "@/utils/progress";

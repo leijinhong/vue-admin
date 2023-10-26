@@ -112,8 +112,7 @@ onBeforeUnmount(() => {
     />
   </div>
 </template>
-
-<style scoped>
+<style scoped lang="scss">
 :deep(.el-loading-mask) {
   opacity: 0.45;
 }

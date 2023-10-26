@@ -7,6 +7,26 @@ import { type multipleScopeVarsOptions } from "@pureadmin/theme";
 /** 预设主题色 */
 const themeColors = {
   default: {
+    // 菜单激活时字体和图标的颜色
+    subMenuActiveText: "#fff",
+    // 菜单未激活时的整体背景色
+    menuBg: "#1A63E4",
+    // 顶部、综合菜单模式下最右上角 搜索、告警、用户名、设置鼠标覆盖后的背景色
+    menuHover: "#4091f7",
+    // 子菜单未激活时的背景色
+    subMenuBg: "#3173e7",
+    // 子菜单激活时的背景色
+    subMenuActiveBg: "red",
+    // 菜单未激活时字体和图标的颜色
+    menuText: "rgba(255,255,255,0.5)",
+    // logo 的背景色
+    sidebarLogo: "#1A63E4",
+    // 鼠标覆盖到菜单时字体和图标的颜色
+    menuTitleHover: "#fff",
+    // 左侧、综合菜单模式下左边菜单 ::before 元素的背景色
+    menuActiveBefore: "#4091f7"
+  },
+  black: {
     subMenuActiveText: "#fff",
     menuBg: "#001529",
     menuHover: "#4091f7",
