@@ -86,8 +86,10 @@ function isOneOfArray(a: Array<string>, b: Array<string>) {
 function filterNoPermissionTree(data: RouteComponent[]) {
   const currentRoles =
     storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? [];
-  const newTree = cloneDeep(data).filter((v: any) =>
-    isOneOfArray(v.meta?.roles, currentRoles)
+  const newTree = cloneDeep(data).filter((v: any) => {
+    if (currentRoles[0] == '*') return true
+    else return isOneOfArray(v.meta?.roles, currentRoles)
+  }
   );
   newTree.forEach(
     (v: any) => v.children && (v.children = filterNoPermissionTree(v.children))
@@ -355,6 +357,7 @@ const roles = computed(() => {
 /** 是否有按钮级别的权限 */
 function hasAuth(value: string): boolean {
   if (!value) return false;
+  else if (roles.value[0] === '*') return true
   return roles.value.includes(value)
 }
 

@@ -5,7 +5,6 @@ export default {
         icon: "streamline:interface-award-crown-reward-social-rating-media-queen-vip-king-crown",
         title: "会员管理",
         // showLink: false,
-        roles: ['/admin/user/list'],
         rank: 1
     },
     children: [
