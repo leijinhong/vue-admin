@@ -29,6 +29,11 @@ const props = {
   columns: {
     type: Array as PropType<TableColumnList>,
     default: () => []
+  },
+  /** 需要展示的列 */
+  isSelection: {
+    type: Boolean,
+    default: true
   }
 };
 
@@ -169,7 +174,13 @@ export default defineComponent({
         Sortable.create(wrapper, {
           animation: 300,
           handle: ".drag-btn",
-          onEnd: ({ newIndex, oldIndex, item }) => {
+          onEnd: ({ newIndex: nIndex, oldIndex: oIndex, item }) => {
+            let newIndex = nIndex;
+            let oldIndex = oIndex;
+            if (props.isSelection) {
+              newIndex += 1;
+              oldIndex += 1;
+            }
             const targetThElem = item;
             const wrapperElem = targetThElem.parentNode as HTMLElement;
             const oldColumn = dynamicColumns.value[oldIndex];

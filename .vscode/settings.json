@@ -1,31 +1,32 @@
 {
-  "editor.formatOnType": true,
-  "editor.formatOnSave": true,
+  "editor.formatOnType": true, // 当您输入代码时，启用自动格式化功能，即在键入时自动进行代码格式化。
+  "editor.formatOnSave": true, // 在保存文件时自动进行代码格式化。
   "[vue]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // 当您在Vue文件中工作时，使用Prettier插件作为默认的代码格式化工具。
   },
-  "editor.tabSize": 2,
-  "editor.formatOnPaste": true,
-  "editor.guides.bracketPairs": "active",
-  "files.autoSave": "afterDelay",
-  "git.confirmSync": false,
-  "workbench.startupEditor": "newUntitledFile",
-  "editor.suggestSelection": "first",
-  "editor.acceptSuggestionOnCommitCharacter": false,
-  "css.lint.propertyIgnoredDueToDisplay": "ignore",
+  "editor.tabSize": 2, // 设置制表符的宽度为2个空格。
+  "editor.formatOnPaste": true, // 当您粘贴代码时，自动进行代码格式化。
+  "editor.guides.bracketPairs": "active", // 在配对的括号周围显示视觉指南。
+  // "files.autoSave": "afterDelay", // 文件在停止编辑后的一定延迟后自动保存。
+  "git.confirmSync": false, // 禁用Git同步时的确认提示框，使同步更加自动化。
+  "workbench.startupEditor": "newUntitledFile", // 在VSCode启动时打开一个新的未命名文件。
+  "editor.suggestSelection": "first", // 当显示代码建议时，自动选择第一个建议。
+  "editor.acceptSuggestionOnCommitCharacter": false, //  禁用通过键入常用的提交字符（例如.或;)来接受建议的功能。
+  "css.lint.propertyIgnoredDueToDisplay": "ignore", // 在CSS文件中忽略由于设置了某些display属性而导致的属性警告。
   "editor.quickSuggestions": {
+    // 启用代码建议，包括对代码、注释和字符串的建议。
     "other": true,
     "comments": true,
     "strings": true
   },
   "files.associations": {
-    "editor.snippetSuggestions": "top"
+    "editor.snippetSuggestions": "top" // 将代码片段（snippets）的建议排在代码建议列表的顶部。
   },
   "[css]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // 当您在CSS文件中工作时，使用Prettier插件作为默认的代码格式化工具。
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": true // 在保存文件时，自动运行ESLint并尝试修复所有可能的问题。
   },
-  "iconify.excludes": ["el"]
+  "iconify.excludes": ["el"] // 在Iconify插件中，排除名为"el"的图标库。
 }

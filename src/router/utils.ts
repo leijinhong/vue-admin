@@ -6,7 +6,8 @@ import {
   createWebHashHistory
 } from "vue-router";
 import { router } from "./index";
-import { isProxy, toRaw } from "vue";
+import { isProxy, toRaw, computed } from "vue";
+import { useUserStoreHook } from "@/store/modules/user";
 import { useTimeoutFn } from "@vueuse/core";
 import {
   isString,
@@ -347,16 +348,14 @@ function getAuths(): Array<string> {
   return router.currentRoute.value.meta.auths as Array<string>;
 }
 
+/** 用户名 */
+const roles = computed(() => {
+  return useUserStoreHook()?.roles;
+});
 /** 是否有按钮级别的权限 */
-function hasAuth(value: string | Array<string>): boolean {
+function hasAuth(value: string): boolean {
   if (!value) return false;
-  /** 从当前路由的`meta`字段里获取按钮级别的所有自定义`code`值 */
-  const metaAuths = getAuths();
-  if (!metaAuths) return false;
-  const isAuths = isString(value)
-    ? metaAuths.includes(value)
-    : isIncludeAllChildren(value, metaAuths);
-  return isAuths ? true : false;
+  return roles.value.includes(value)
 }
 
 /** 获取所有菜单中的第一个菜单（顶级菜单）*/
