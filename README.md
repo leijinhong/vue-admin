@@ -1,4 +1,4 @@
-<h1>vue-pure-admin精简版（非国际化版本）</h1>
+<h1>基于vue-pure-admin精简版</h1>
 
 ## 简述
 
