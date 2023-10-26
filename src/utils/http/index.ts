@@ -13,6 +13,7 @@ import { stringify } from "qs";
 import NProgress from "../progress";
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
+const { VITE_CONFIG_URL_PROXY } = import.meta.env;
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -102,9 +103,11 @@ class PureHttp {
                   config.headers["Authorization"] = formatToken(
                     data.accessToken
                   );
+                  config.url = VITE_CONFIG_URL_PROXY + config.url;
                   resolve(config);
                 }
               } else {
+                config.url = VITE_CONFIG_URL_PROXY + config.url;
                 resolve(config);
               }
             });
