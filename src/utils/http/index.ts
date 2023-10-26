@@ -78,39 +78,39 @@ class PureHttp {
         return whiteList.some(v => config.url.indexOf(v) > -1)
           ? config
           : new Promise(resolve => {
-              const data = getToken();
-              if (data) {
-                const now = new Date().getTime();
-                const expired = parseInt(data.expires) - now <= 0;
-                if (expired) {
-                  if (!PureHttp.isRefreshing) {
-                    PureHttp.isRefreshing = true;
-                    // token过期刷新
-                    useUserStoreHook()
-                      .handRefreshToken({ refreshToken: data.refreshToken })
-                      .then(res => {
-                        const token = res.data.accessToken;
-                        config.headers["Authorization"] = formatToken(token);
-                        PureHttp.requests.forEach(cb => cb(token));
-                        PureHttp.requests = [];
-                      })
-                      .finally(() => {
-                        PureHttp.isRefreshing = false;
-                      });
-                  }
-                  resolve(PureHttp.retryOriginalRequest(config));
-                } else {
-                  config.headers["Authorization"] = formatToken(
-                    data.accessToken
-                  );
-                  config.url = VITE_CONFIG_URL_PROXY + config.url;
-                  resolve(config);
-                }
-              } else {
-                config.url = VITE_CONFIG_URL_PROXY + config.url;
-                resolve(config);
-              }
-            });
+            const data = getToken();
+            if (data) {
+              const now = new Date().getTime();
+              const expired = parseInt(data.expires) - now <= 0;
+              // if (expired) {
+              //   if (!PureHttp.isRefreshing) {
+              //     PureHttp.isRefreshing = true;
+              //     // token过期刷新
+              //     useUserStoreHook()
+              //       .handRefreshToken({ refreshToken: data.refreshToken })
+              //       .then(res => {
+              //         const token = res.data.accessToken;
+              //         config.headers["Authorization"] = formatToken(token);
+              //         PureHttp.requests.forEach(cb => cb(token));
+              //         PureHttp.requests = [];
+              //       })
+              //       .finally(() => {
+              //         PureHttp.isRefreshing = false;
+              //       });
+              //   }
+              //   resolve(PureHttp.retryOriginalRequest(config));
+              // } else {
+              config.headers["Authorization"] = formatToken(
+                data.accessToken
+              );
+              config.url = VITE_CONFIG_URL_PROXY + config.url;
+              resolve(config);
+              // }
+            } else {
+              config.url = VITE_CONFIG_URL_PROXY + config.url;
+              resolve(config);
+            }
+          });
       },
       error => {
         return Promise.reject(error);

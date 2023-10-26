@@ -8,6 +8,7 @@ import { type PaginationProps } from "@pureadmin/table";
 import { reactive, ref, onMounted, h, toRaw, computed, watch } from "vue";
 import { priceToThousands } from "@pureadmin/utils";
 import { ElMessageBox } from "element-plus";
+import useExecl from "@/hooks/useExecl";
 const { VITE_CONFIG_URL } = import.meta.env;
 
 export function useRole() {
@@ -35,6 +36,7 @@ export function useRole() {
   const loading = ref(true);
   const switchLoadMap = ref({});
   const { switchStyle } = usePublicHooks();
+  const selectList = ref([]);
   // 分页器配置
   const pagination = reactive<PaginationProps>({
     total: 0,
@@ -68,19 +70,21 @@ export function useRole() {
     },
     {
       label: "所在地区",
-      prop: "area_str"
+      prop: "resumeInfo.site"
     },
     {
       label: "会员类型",
+      prop: "type",
       cellRenderer: scope => <div>{scope.row.type}</div>
     },
     {
       label: "VIP会员",
-      prop: "isVip",
+      prop: "is_vip",
       cellRenderer: scope => <div>{scope.row.is_vip == 1 ? "是" : "否"}</div>
     },
     {
       label: "会员状态",
+      prop: "status",
       cellRenderer: scope => (
         <el-switch
           size={scope.props.size}
@@ -98,7 +102,7 @@ export function useRole() {
     },
     {
       label: "注册时间",
-      prop: "register_time",
+      prop: "registerTime",
       width: 180
     },
     {
@@ -126,7 +130,7 @@ export function useRole() {
   }
 
   function handleSelectionChange(val) {
-    console.log("handleSelectionChange", val);
+    selectList.value = val;
   }
 
   async function onSearch(page = 1) {
@@ -155,6 +159,9 @@ export function useRole() {
     onSearch();
   };
 
+  const exportCheckItem = () => {
+    useExecl(columns, selectList.value);
+  };
   return {
     selectValue,
     form,
@@ -170,6 +177,7 @@ export function useRole() {
     // handleDatabase,
     handleSizeChange,
     handleCurrentChange,
-    handleSelectionChange
+    handleSelectionChange,
+    exportCheckItem
   };
 }

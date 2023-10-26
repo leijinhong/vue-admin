@@ -3,32 +3,36 @@ import { MockMethod } from "vite-plugin-mock";
 
 export default [
   {
-    url: "/login",
+    url: "/admin/account/login",
     method: "post",
     response: ({ body }) => {
       if (body.username === "admin") {
         return {
-          success: true,
+          code: 0,
           data: {
-            username: "admin",
-            roles: ["*"],
-            accessToken: "eyJhbGciOiJIUzUxMiJ9.admin",
-            refreshToken: "eyJhbGciOiJIUzUxMiJ9.adminRefresh",
-            expires: "2023/10/30 00:00:00"
+            "nickname": "超级管理员",
+            "token": "c95524bc2d35d941666c536c3e6a3d9f"
           }
         };
       } else {
         return {
-          success: true,
+          code: 0,
           data: {
-            username: "common",
-            roles: ["/admin/user/list", '/admin/user/add', '/admin/user/edit'],
-            accessToken: "eyJhbGciOiJIUzUxMiJ9.common",
-            refreshToken: "eyJhbGciOiJIUzUxMiJ9.commonRefresh",
-            expires: "2023/10/30 00:00:00"
+            "nickname": body.username,
+            "token": "c95524bc2d35d941666c536c3e6a3d9f"
           }
         };
       }
+    }
+  },
+  {
+    url: "/admin/rule/permission",
+    method: "get",
+    response: () => {
+      return {
+        code: 0,
+        data: ['*']
+      };
     }
   }
 ] as MockMethod[];

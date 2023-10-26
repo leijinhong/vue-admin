@@ -186,32 +186,36 @@ function handleAsyncRoutes(routeList) {
 
 /** 初始化路由（`new Promise` 写法防止在异步请求中造成无限循环）*/
 function initRouter() {
-  if (getConfig()?.CachingAsyncRoutes) {
-    // 开启动态路由缓存本地sessionStorage
-    const key = "async-routes";
-    const asyncRouteList = storageSession().getItem(key) as any;
-    if (asyncRouteList && asyncRouteList?.length > 0) {
-      return new Promise(resolve => {
-        handleAsyncRoutes(asyncRouteList);
-        resolve(router);
-      });
-    } else {
-      return new Promise(resolve => {
-        getAsyncRoutes().then(({ data }) => {
-          handleAsyncRoutes(cloneDeep(data));
-          storageSession().setItem(key, data);
-          resolve(router);
-        });
-      });
-    }
-  } else {
-    return new Promise(resolve => {
-      getAsyncRoutes().then(({ data }) => {
-        handleAsyncRoutes(cloneDeep(data));
-        resolve(router);
-      });
-    });
-  }
+  return new Promise(resolve => {
+    usePermissionStoreHook().handleWholeMenus([]);
+    resolve(router);
+  });
+  // if (getConfig()?.CachingAsyncRoutes) {
+  //   // 开启动态路由缓存本地sessionStorage
+  //   const key = "async-routes";
+  //   const asyncRouteList = storageSession().getItem(key) as any;
+  //   if (asyncRouteList && asyncRouteList?.length > 0) {
+  //     return new Promise(resolve => {
+  //       handleAsyncRoutes(asyncRouteList);
+  //       resolve(router);
+  //     });
+  //   } else {
+  //     return new Promise(resolve => {
+  //       getAsyncRoutes().then(({ data }) => {
+  //         handleAsyncRoutes(cloneDeep(data));
+  //         storageSession().setItem(key, data);
+  //         resolve(router);
+  //       });
+  //     });
+  //   }
+  // } else {
+  //   return new Promise(resolve => {
+  //     getAsyncRoutes().then(({ data }) => {
+  //       handleAsyncRoutes(cloneDeep(data));
+  //       resolve(router);
+  //     });
+  //   });
+  // }
 }
 
 /**
@@ -365,6 +369,7 @@ function hasAuth(value: string): boolean {
 function getTopMenu(tag = false): menuType {
   const topMenu = usePermissionStoreHook().wholeMenus[0]?.children[0];
   tag && useMultiTagsStoreHook().handleTags("push", topMenu);
+
   return topMenu;
 }
 

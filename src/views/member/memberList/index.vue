@@ -34,7 +34,8 @@ const {
   // handleDatabase,
   handleSizeChange,
   handleCurrentChange,
-  handleSelectionChange
+  handleSelectionChange,
+  exportCheckItem
 } = useRole();
 
 onMounted(() => {
@@ -126,6 +127,15 @@ onMounted(() => {
       @refresh="onSearch(pagination.currentPage)"
     >
       <template #buttons>
+        <Auth value="/admin/user/export">
+          <el-button
+            type="primary"
+            :icon="useRenderIcon(AddFill)"
+            @click="exportCheckItem"
+          >
+            导出
+          </el-button>
+        </Auth>
         <Auth value="/admin/user/add">
           <el-button type="primary" :icon="useRenderIcon(AddFill)">
             添加会员

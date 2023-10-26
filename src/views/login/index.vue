@@ -18,6 +18,8 @@ import darkIcon from "@/assets/svg/dark.svg?component";
 import Lock from "@iconify-icons/ri/lock-fill";
 import User from "@iconify-icons/ri/user-3-fill";
 
+const { VITE_CONFIG_URL } = import.meta.env;
+
 defineOptions({
   name: "Login"
 });
@@ -33,19 +35,24 @@ dataThemeChange();
 const { title } = useNav();
 
 const ruleForm = reactive({
-  username: "admin",
-  password: "admin123"
+  username: "",
+  password: "",
+  captcha: ""
 });
+const codeTimestamp = ref(+new Date());
 
+const refreshCode = () => {
+  codeTimestamp.value = +new Date();
+};
 const onLogin = async (formEl: FormInstance | undefined) => {
   loading.value = true;
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
       useUserStoreHook()
-        .loginByUsername({ username: ruleForm.username, password: "admin123" })
+        .loginByUsername(ruleForm)
         .then(res => {
-          if (res.success) {
+          if (res.code == 0) {
             // 获取后端路由
             initRouter().then(() => {
               router.push(getTopMenu(true).path);
@@ -107,16 +114,7 @@ onBeforeUnmount(() => {
             size="large"
           >
             <Motion :delay="100">
-              <el-form-item
-                :rules="[
-                  {
-                    required: true,
-                    message: '请输入账号',
-                    trigger: 'blur'
-                  }
-                ]"
-                prop="username"
-              >
+              <el-form-item prop="username">
                 <el-input
                   clearable
                   v-model="ruleForm.username"
@@ -135,6 +133,26 @@ onBeforeUnmount(() => {
                   placeholder="密码"
                   :prefix-icon="useRenderIcon(Lock)"
                 />
+              </el-form-item>
+            </Motion>
+
+            <Motion :delay="200">
+              <el-form-item prop="captcha">
+                <el-input
+                  clearable
+                  v-model="ruleForm.captcha"
+                  placeholder="输入验证码"
+                  :prefix-icon="useRenderIcon('ri:shield-keyhole-line')"
+                  @keyup.enter="onLogin(ruleFormRef)"
+                >
+                  <template v-slot:append>
+                    <img
+                      @click="refreshCode"
+                      :src="`${VITE_CONFIG_URL}/admin/account/captcha/login?v=${codeTimestamp}`"
+                      style="max-height: 120px; min-width: 120px; height: 40px"
+                    />
+                  </template>
+                </el-input>
               </el-form-item>
             </Motion>
 
