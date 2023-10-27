@@ -7,6 +7,9 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      boxShadow: {
+        '1': '0px 2px 8px 1px rgba(51,51,51,0.16)'
+      },
       colors: {
         bg_color: "var(--el-bg-color)",
         primary: "var(--el-color-primary)",

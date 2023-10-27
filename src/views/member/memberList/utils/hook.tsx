@@ -114,7 +114,7 @@ export function useRole() {
   ];
 
   function handleDelete(row) {
-    message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
+    message(`您删除了角色名称为${row.id}的这条数据`, { type: "success" });
     onSearch(pagination.currentPage);
   }
 
@@ -132,6 +132,26 @@ export function useRole() {
   function handleSelectionChange(val) {
     selectList.value = val;
   }
+
+  const batchDel = () => {
+    if (selectList.value.length == 0) {
+      message("请选择要删除的数据", { type: "warning" });
+    } else {
+      ElMessageBox.confirm(
+        "选中数据id为" + selectList.value.join() + "，确认要删除这些数据吗？",
+        "删除提示",
+        {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(() => {
+          handleDelete({ id: selectList.value.join() } as any);
+        })
+        .catch(() => {});
+    }
+  };
 
   async function onSearch(page = 1) {
     loading.value = true;
@@ -178,6 +198,7 @@ export function useRole() {
     handleSizeChange,
     handleCurrentChange,
     handleSelectionChange,
-    exportCheckItem
+    exportCheckItem,
+    batchDel
   };
 }

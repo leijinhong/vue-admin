@@ -1,5 +1,6 @@
 import { useEpThemeStoreHook } from "@/store/modules/epTheme";
 import { defineComponent, ref, computed, type PropType, nextTick } from "vue";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import {
   delay,
   cloneDeep,
@@ -213,26 +214,45 @@ export default defineComponent({
 
     const reference = {
       reference: () => (
-        <SettingIcon
-          class={["w-[16px]", iconClass.value]}
+        // <SettingIconz
+        //   class={["w-[16px]", iconClass.value]}
+        // onMouseover={e => (buttonRef.value = e.currentTarget)}
+        // />
+        <el-button
+          style="
+              padding: 10px 20px 10px 10px;
+              --el-font-size-base: 16px;
+              height: var(--el-component-size);
+              background:white;
+              color:#333333;
+              border-color:#CCCCCC;
+            "
+          type="primary"
+          icon={useRenderIcon("lucide:list")}
+          class={[iconClass.value]}
           onMouseover={e => (buttonRef.value = e.currentTarget)}
-        />
+        >
+          列表信息
+        </el-button>
       )
     };
 
     return () => (
       <>
-        <div {...attrs} class="w-[99/100] mt-2 px-2 pb-2 bg-bg_color">
-          <div class="flex justify-between w-full h-[60px] p-4">
-            {slots?.title ? (
+        <div {...attrs} class="shadow-1 rounded-[10px] mt-4 p-5 bg-bg_color">
+          <div class="flex justify-between w-full  p-0">
+            {slots?.buttons ? <div class="flex">{slots.buttons()}</div> : null}
+
+            {slots?.centerBens ? (
+              <div class="flex">{slots.centerBens()}</div>
+            ) : null}
+
+            {/* {slots?.title ? (
               slots.title()
             ) : (
               <p class="font-bold truncate">{props.title}</p>
-            )}
+            )} */}
             <div class="flex items-center justify-around">
-              {slots?.buttons ? (
-                <div class="flex mr-4">{slots.buttons()}</div>
-              ) : null}
               {props.tableRef?.size ? (
                 <>
                   <el-tooltip
@@ -251,23 +271,36 @@ export default defineComponent({
                   <el-divider direction="vertical" />
                 </>
               ) : null}
-              <el-tooltip effect="dark" content="刷新" placement="top">
-                <RefreshIcon
-                  class={[
-                    "w-[16px]",
-                    iconClass.value,
-                    loading.value ? "animate-spin" : ""
-                  ]}
+
+              {/* <el-button
+                style="
+              padding: 10px 20px;
+              --el-font-size-base: 16px;
+              height: var(--el-component-size);
+            "
+                type="primary"
+                icon={useRenderIcon(RefreshIcon)}
+                class={[iconClass.value, loading.value ? "animate-spin" : ""]}
+                onClick={() => onReFresh()}
+              >
+                刷新
+              </el-button>
+
+              <el-dropdown v-slots={dropdown} trigger="click">
+                <el-button
+                  style="
+              padding: 10px 20px;
+              --el-font-size-base: 16px;
+              height: var(--el-component-size);
+            "
+                  type="primary"
+                  icon={useRenderIcon(CollapseIcon)}
+                  class={[iconClass.value]}
                   onClick={() => onReFresh()}
-                />
-              </el-tooltip>
-              <el-divider direction="vertical" />
-              <el-tooltip effect="dark" content="密度" placement="top">
-                <el-dropdown v-slots={dropdown} trigger="click">
-                  <CollapseIcon class={["w-[16px]", iconClass.value]} />
-                </el-dropdown>
-              </el-tooltip>
-              <el-divider direction="vertical" />
+                >
+                  密度
+                </el-button>
+              </el-dropdown> */}
 
               <el-popover
                 v-slots={reference}
@@ -336,7 +369,7 @@ export default defineComponent({
               </el-popover>
             </div>
 
-            <el-tooltip
+            {/* <el-tooltip
               popper-options={{
                 modifiers: [
                   {
@@ -353,8 +386,11 @@ export default defineComponent({
               virtual-triggering
               trigger="hover"
               content="列设置"
-            />
+            /> */}
           </div>
+
+          <el-divider class="mt-5" />
+
           {slots.default({
             size: size.value,
             dynamicColumns: dynamicColumns.value

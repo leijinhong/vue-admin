@@ -7,6 +7,8 @@ import { useRole } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
+import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
+
 // import Database from "@iconify-icons/ri/database-2-line";
 // import More from "@iconify-icons/ep/more-filled";
 import Delete from "@iconify-icons/ep/delete";
@@ -35,7 +37,8 @@ const {
   handleSizeChange,
   handleCurrentChange,
   handleSelectionChange,
-  exportCheckItem
+  exportCheckItem,
+  batchDel
 } = useRole();
 
 onMounted(() => {
@@ -45,100 +48,109 @@ onMounted(() => {
 
 <template>
   <div class="main">
-    <el-form
-      ref="formRef"
-      :inline="true"
-      :model="form"
-      class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
-    >
-      <el-form-item label="会员搜索：" prop="keyword">
-        <el-input v-model="form.keyword" v-show="false" />
-        <div>
-          <el-select
-            v-model="selectValue"
-            placeholder="请选择"
-            class="w-28"
-            style="--el-input-border-radius: 0"
-          >
-            <el-option label="会员编号" value="code" />
-            <el-option label="昵称" value="name" />
-            <el-option label="手机" value="phone" />
-          </el-select>
+    <div class="flex justify-between rounded-[10px] shadow-1 bg-bg_color p-5">
+      <el-form ref="formRef" :inline="true" :model="form" class="search-form">
+        <el-form-item label="" prop="keyword">
           <el-input
             v-model="form.keyword"
-            placeholder="请输入"
+            placeholder="项目名称"
             clearable
-            class="!w-[200px]"
-            style="--el-input-border-radius: 0 4px 4px 0"
+            class="!w-[184px]"
           />
-        </div>
-      </el-form-item>
-      <el-form-item label="vip会员：" prop="is_vip">
-        <el-select
-          v-model="form.is_vip"
-          placeholder="请选择状态"
-          clearable
-          class="!w-[180px]"
-        >
-          <el-option label="是" :value="1" />
-          <el-option label="否" :value="2" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="会员类型：" prop="type">
-        <el-select
-          v-model="form.type"
-          placeholder="请选择状态"
-          clearable
-          class="!w-[180px]"
-        >
-          <el-option label="老师" :value="2" />
-          <el-option label="学员" :value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="实名认证：" prop="smrz">
-        <el-select
-          v-model="form.smrz"
-          placeholder="请选择状态"
-          clearable
-          class="!w-[180px]"
-        >
-          <el-option label="是" :value="1" />
-          <el-option label="否" :value="2" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
+        </el-form-item>
+        <el-form-item label="" prop="is_vip">
+          <el-input
+            v-model="form.keyword"
+            placeholder="项目编号"
+            clearable
+            class="!w-[204px]"
+          />
+        </el-form-item>
+        <el-form-item label="" prop="type">
+          <el-select
+            v-model="form.type"
+            placeholder="客户名称"
+            clearable
+            class="!w-[138px]"
+            :suffix-icon="useRenderIcon(CaretBottom)"
+          >
+            <el-option label="老师" :value="2" />
+            <el-option label="学员" :value="1" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div>
         <el-button
+          style="
+            padding: 10px 20px 10px 10px;
+            --el-font-size-base: 16px;
+            height: var(--el-component-size);
+          "
           type="primary"
           :icon="useRenderIcon(Search)"
           :loading="loading"
           @click="onSearch()"
         >
-          搜索
+          查询
         </el-button>
-        <el-button :icon="useRenderIcon(Refresh)" @click="resetForm(formRef)">
+        <el-button
+          style="
+            padding: 10px 20px 10px 10px;
+            --el-font-size-base: 16px;
+            height: var(--el-component-size) !important;
+          "
+          :icon="useRenderIcon(Refresh)"
+          @click="resetForm(formRef)"
+        >
           重置
         </el-button>
-      </el-form-item>
-    </el-form>
-
+      </div>
+    </div>
     <PureTableBar
       title="会员列表"
       :columns="columns"
       @refresh="onSearch(pagination.currentPage)"
     >
       <template #buttons>
+        <Auth value="/admin/user/add">
+          <el-button
+            style="
+              padding: 10px 20px 10px 10px;
+              --el-font-size-base: 16px;
+              height: var(--el-component-size);
+            "
+            type="primary"
+            :icon="useRenderIcon(AddFill)"
+          >
+            添加
+          </el-button>
+        </Auth>
+        <Auth value="/admin/user/del">
+          <el-button
+            style="
+              padding: 10px 20px 10px 10px;
+              --el-font-size-base: 16px;
+              height: var(--el-component-size);
+            "
+            type="danger"
+            :icon="useRenderIcon(Delete)"
+            @click="batchDel"
+          >
+            删除
+          </el-button>
+        </Auth>
         <Auth value="/admin/user/export">
           <el-button
-            type="primary"
+            style="
+              padding: 10px 20px 10px 10px;
+              --el-font-size-base: 16px;
+              height: var(--el-component-size);
+            "
+            type="success"
             :icon="useRenderIcon(AddFill)"
             @click="exportCheckItem"
           >
             导出
-          </el-button>
-        </Auth>
-        <Auth value="/admin/user/add">
-          <el-button type="primary" :icon="useRenderIcon(AddFill)">
-            添加会员
           </el-button>
         </Auth>
       </template>
@@ -154,35 +166,23 @@ onMounted(() => {
           :pagination="pagination"
           :paginationSmall="size === 'small' ? true : false"
           :header-cell-style="{
-            background: 'var(--el-table-row-hover-bg-color)',
             color: 'var(--el-text-color-primary)'
           }"
+          stripe
           @selection-change="handleSelectionChange"
           @page-size-change="handleSizeChange"
           @page-current-change="handleCurrentChange"
         >
           <template #operation="{ row }">
             <Auth value="/admin/user/edit">
-              <el-button
-                class="reset-margin"
-                link
-                type="primary"
-                :size="size"
-                :icon="useRenderIcon(EditPen)"
-              >
+              <el-button class="reset-margin" link type="info" :size="size">
                 编辑
               </el-button>
             </Auth>
 
-            <Auth value="/admin/user/detail">
-              <el-button
-                class="reset-margin"
-                link
-                type="primary"
-                :size="size"
-                :icon="useRenderIcon('ooui:view-details-rtl')"
-              >
-                详情
+            <Auth value="/admin/user/del">
+              <el-button class="reset-margin" link type="danger" :size="size">
+                删除
               </el-button>
             </Auth>
           </template>
@@ -199,7 +199,7 @@ onMounted(() => {
 
 .search-form {
   :deep(.el-form-item) {
-    margin-bottom: 12px;
+    margin-bottom: 0;
   }
 }
 </style>

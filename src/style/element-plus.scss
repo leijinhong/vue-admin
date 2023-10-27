@@ -1,3 +1,73 @@
+.el-pagination {
+  justify-content: center !important;
+  .el-input {
+    height: 32px;
+    .el-input__inner {
+      font-size: 14px;
+    }
+  }
+}
+.el-button--info.is-link {
+  --el-button-hover-link-text-color: #333333;
+  border: 1px solid #cccccc !important;
+  --el-button-text-color: #333333 !important;
+  padding: 2px 10px !important;
+  height: 24px !important;
+}
+.el-button--danger.is-link {
+  --el-button-active-color: #db3f3f;
+  --el-button-hover-link-text-color: #f33d3d;
+  border: 1px solid #f33d3d !important;
+  --el-button-text-color: #f33d3d !important;
+  padding: 2px 10px !important;
+  height: 24px !important;
+}
+.el-table {
+  // --el-table-row-hover-bg-color: white !important;
+  thead {
+    font-weight: 100 !important;
+    --el-table-header-text-color: #333333;
+    th.el-table__cell {
+      font-weight: 400;
+    }
+  }
+  .el-table__row--striped {
+    --el-fill-color-lighter: white;
+    --el-bg-color: white !important;
+    background-color: white !important;
+    // td.el-table__cell {
+    // }
+  }
+  .el-table__row {
+    --el-bg-color: #f3f7fe;
+    background-color: #f3f7fe;
+    // td.el-table__cell {
+    // }
+  }
+}
+
+.el-button {
+  --el-border-radius-base: 10px;
+}
+
+.el-form--inline .el-form-item {
+  margin-right: 20px !important;
+}
+.el-select .el-input .el-select__caret {
+  --el-select-input-color: #333333;
+}
+.el-input__wrapper {
+  --el-input-border-radius: 4px;
+  --el-input-border-color: #ccc;
+  padding: 1px 20px !important;
+  .el-input__inner {
+    font-size: 16px;
+    &::placeholder {
+      color: #666666;
+    }
+  }
+}
+
 .el-breadcrumb__inner,
 .el-breadcrumb__inner a {
   font-weight: 400 !important;

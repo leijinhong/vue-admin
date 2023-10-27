@@ -117,7 +117,7 @@ const {
 
   .breadcrumb-container {
     float: left;
-    margin-left: 16px;
+    margin-left: 40px;
   }
 }
 

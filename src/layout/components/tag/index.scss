@@ -46,7 +46,7 @@
   font-size: 14px;
   color: var(--el-text-color-primary);
   background: #fff;
-  box-shadow: 0 0 1px #888;
+  border-top: 1px solid #f4f0f0;
 
   .scroll-item {
     position: relative;
@@ -115,7 +115,7 @@
         transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 
         &:nth-child(1) {
-          margin-left: 5px;
+          margin-left: 40px;
         }
       }
     }
