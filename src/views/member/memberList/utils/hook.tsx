@@ -5,7 +5,16 @@ import { getMemberList } from "@/api/member";
 import { usePublicHooks } from "../../hooks";
 import { addDialog } from "@/components/ReDialog";
 import { type PaginationProps } from "@pureadmin/table";
-import { reactive, ref, onMounted, h, toRaw, computed, watch } from "vue";
+import {
+  reactive,
+  ref,
+  onMounted,
+  h,
+  toRaw,
+  computed,
+  watch,
+  watchEffect
+} from "vue";
 import { priceToThousands } from "@pureadmin/utils";
 import { ElMessageBox } from "element-plus";
 import useExecl from "@/hooks/useExecl";
@@ -38,20 +47,34 @@ export function useRole() {
   const switchLoadMap = ref({});
   const { switchStyle } = usePublicHooks();
   const selectList = ref([]);
+
   // 分页器配置
-  const pageLayout = computed(() => {
-    return useAppStoreHook().device == "mobile"
-      ? "prev,pager,next"
-      : "total, sizes, prev, pager, next, jumper";
-  });
+  // const pageLayout = computed(() => {
+  //   return useAppStoreHook().device == "mobile"
+  //     ? "prev,pager,next"
+  //     : "total, sizes, prev, pager, next, jumper";
+  // });
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
     background: true,
-    layout: pageLayout.value,
+    layout: "",
     pageSizes: [10, 20, 50, 100, 200]
   });
+  watch(
+    () => useAppStoreHook().device,
+    n => {
+      console.log("触发");
+      pagination.layout =
+        n == "mobile"
+          ? "prev,pager,next"
+          : "total, sizes, prev, pager, next, jumper";
+    },
+    {
+      immediate: true
+    }
+  );
 
   // 会员列表表格内容
   const columns: TableColumnList = [
