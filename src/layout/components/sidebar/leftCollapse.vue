@@ -41,7 +41,7 @@ const toggleClick = () => {
 
 <template>
   <div class="container">
-    <el-tooltip
+    <!-- <el-tooltip
       placement="right"
       :visible="visible"
       :effect="tooltipEffect"
@@ -55,7 +55,7 @@ const toggleClick = () => {
         @mouseenter="visible = true"
         @mouseleave="visible = false"
       />
-    </el-tooltip>
+    </el-tooltip> -->
   </div>
 </template>
 

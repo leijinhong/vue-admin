@@ -1,3 +1,23 @@
+.el-table th.el-table__cell.is-leaf {
+  background-color: #f0f0f0;
+}
+.el-table td.el-table__cell,
+.el-table th.el-table__cell.is-leaf {
+  border-bottom: 1px solid transparent !important;
+}
+.el-breadcrumb__item {
+  span {
+    font-size: 16px;
+  }
+}
+.el-tabs__item {
+  --el-font-size-base: 16px;
+}
+.el-form .el-form-item__label {
+  // height: 40px;
+  // line-height: 40px;
+}
+
 .el-pagination {
   justify-content: center !important;
   .el-input {
@@ -26,9 +46,16 @@
   // --el-table-row-hover-bg-color: white !important;
   thead {
     font-weight: 100 !important;
+    --el-text-color-primary: #333;
     --el-table-header-text-color: #333333;
+    --el-table-header-bg-color: #f0f0f0;
     th.el-table__cell {
       font-weight: 400;
+      padding: 11px 0;
+      .cell {
+        height: 25px;
+        line-height: 25px;
+      }
     }
   }
   .el-table__row--striped {

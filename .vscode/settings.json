@@ -1,11 +1,11 @@
 {
-  "editor.formatOnType": true, // 当您输入代码时，启用自动格式化功能，即在键入时自动进行代码格式化。
+  "editor.formatOnType": false, // 当您输入代码时，启用自动格式化功能，即在键入时自动进行代码格式化。
   "editor.formatOnSave": true, // 在保存文件时自动进行代码格式化。
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode" // 当您在Vue文件中工作时，使用Prettier插件作为默认的代码格式化工具。
   },
   "editor.tabSize": 2, // 设置制表符的宽度为2个空格。
-  "editor.formatOnPaste": true, // 当您粘贴代码时，自动进行代码格式化。
+  "editor.formatOnPaste": false, // 当您粘贴代码时，自动进行代码格式化。
   "editor.guides.bracketPairs": "active", // 在配对的括号周围显示视觉指南。
   // "files.autoSave": "afterDelay", // 文件在停止编辑后的一定延迟后自动保存。
   "git.confirmSync": false, // 禁用Git同步时的确认提示框，使同步更加自动化。

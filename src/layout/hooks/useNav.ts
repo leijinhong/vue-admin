@@ -107,6 +107,9 @@ export function useNav() {
     return remainingPaths.includes(path);
   }
 
+  function editUserInfo() {
+    router.push({ name: 'personalData' })
+  }
   return {
     route,
     title,
@@ -128,6 +131,7 @@ export function useNav() {
     username,
     userAvatar,
     avatarsStyle,
-    tooltipEffect
+    tooltipEffect,
+    editUserInfo
   };
 }

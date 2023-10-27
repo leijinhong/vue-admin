@@ -389,7 +389,8 @@ export default defineComponent({
             /> */}
           </div>
 
-          <el-divider class="mt-5" />
+          <div class="mt-5"></div>
+          {/* <el-divider class="mt-5" /> */}
 
           {slots.default({
             size: size.value,

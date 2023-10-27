@@ -1,6 +1,6 @@
 export default {
     path: "/member",
-    redirect: "/member/memberList",
+    redirect: "/member/member-list",
     meta: {
         icon: "streamline:interface-award-crown-reward-social-rating-media-queen-vip-king-crown",
         title: "会员管理",

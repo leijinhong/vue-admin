@@ -7,6 +7,7 @@ import Breadcrumb from "./sidebar/breadCrumb.vue";
 import topCollapse from "./sidebar/topCollapse.vue";
 import LogoutCircleRLine from "@iconify-icons/ri/logout-circle-r-line";
 import Setting from "@iconify-icons/ri/settings-3-line";
+import UserInfoIcon from "@iconify-icons/ep/user-filled";
 
 const {
   layout,
@@ -17,7 +18,8 @@ const {
   username,
   userAvatar,
   avatarsStyle,
-  toggleSideBar
+  toggleSideBar,
+  editUserInfo
 } = useNav();
 </script>
 
@@ -52,6 +54,10 @@ const {
         </span>
         <template #dropdown>
           <el-dropdown-menu class="logout">
+            <el-dropdown-item @click="editUserInfo">
+              <IconifyIconOffline :icon="UserInfoIcon" style="margin: 5px" />
+              个人资料
+            </el-dropdown-item>
             <el-dropdown-item @click="logout">
               <IconifyIconOffline
                 :icon="LogoutCircleRLine"
@@ -62,6 +68,7 @@ const {
           </el-dropdown-menu>
         </template>
       </el-dropdown>
+
       <!-- <span
         class="set-icon navbar-bg-hover"
         title="打开项目配置"
@@ -100,6 +107,7 @@ const {
       justify-content: space-around;
       height: 48px;
       padding: 10px;
+      padding-right: 40px;
       color: #000000d9;
       cursor: pointer;
 
@@ -123,6 +131,7 @@ const {
 
 .logout {
   max-width: 120px;
+  min-width: 112px;
 
   ::v-deep(.el-dropdown-menu__item) {
     display: inline-flex;

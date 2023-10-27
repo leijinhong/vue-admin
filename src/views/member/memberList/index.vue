@@ -166,32 +166,32 @@ onMounted(() => {
             全部
           </button>
           <button
-            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent hover:text-primary"
           >
             销售线索
           </button>
           <button
-            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent hover:text-primary"
           >
             销售商机
           </button>
           <button
-            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent hover:text-primary"
           >
             项目立项
           </button>
           <button
-            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent hover:text-primary"
           >
             项目立项
           </button>
           <button
-            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent hover:text-primary"
           >
             合同执行
           </button>
           <button
-            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent hover:text-primary"
           >
             售后运维
           </button>

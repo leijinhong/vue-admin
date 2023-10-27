@@ -1,6 +1,6 @@
 export default {
     path: "/competitor",
-    redirect: "/competitor/competitorList",
+    redirect: "/competitor/competitor-list",
     meta: {
         icon: "streamline:interface-award-crown-reward-social-rating-media-queen-vip-king-crown",
         title: "竞品",

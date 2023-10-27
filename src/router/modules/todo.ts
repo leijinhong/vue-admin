@@ -1,6 +1,6 @@
 export default {
     path: "/todo",
-    redirect: "/todo/approvalQuotes",
+    redirect: "/todo/approval-quotes",
     meta: {
         icon: "streamline:interface-award-crown-reward-social-rating-media-queen-vip-king-crown",
         title: "待办",

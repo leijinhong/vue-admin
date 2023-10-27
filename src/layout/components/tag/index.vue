@@ -585,8 +585,8 @@ onBeforeUnmount(() => {
       placement="bottom-end"
       @command="handleCommand"
     >
-      <span class="arrow-down">
-        <IconifyIconOffline :icon="ArrowDown" class="dark:text-white" />
+      <span class="arrow-down mr-10">
+        <IconifyIconOffline :icon="ArrowDown" class="dark:text-white right-0" />
       </span>
       <template #dropdown>
         <el-dropdown-menu>
