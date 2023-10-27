@@ -65,7 +65,6 @@ export function useRole() {
   watch(
     () => useAppStoreHook().device,
     n => {
-      console.log("触发");
       pagination.layout =
         n == "mobile"
           ? "prev,pager,next"

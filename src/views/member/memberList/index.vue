@@ -81,7 +81,7 @@ onMounted(() => {
           </el-select>
         </el-form-item>
       </el-form>
-      <div class="">
+      <div class="flex gap-x-3 gap-y-3">
         <el-button
           style="
             padding: 10px 20px 10px 10px;
@@ -114,47 +114,88 @@ onMounted(() => {
       @refresh="onSearch(pagination.currentPage)"
     >
       <template #buttons>
-        <Auth value="/admin/user/add">
-          <el-button
-            style="
-              padding: 10px 20px 10px 10px;
-              --el-font-size-base: 16px;
-              height: var(--el-component-size);
-            "
-            type="primary"
-            :icon="useRenderIcon(AddFill)"
+        <div class="flex gap-3">
+          <Auth value="/admin/user/add">
+            <el-button
+              style="
+                padding: 10px 20px 10px 10px;
+                --el-font-size-base: 16px;
+                height: var(--el-component-size);
+              "
+              type="primary"
+              :icon="useRenderIcon(AddFill)"
+            >
+              添加
+            </el-button>
+          </Auth>
+          <Auth value="/admin/user/del">
+            <el-button
+              style="
+                padding: 10px 20px 10px 10px;
+                --el-font-size-base: 16px;
+                height: var(--el-component-size);
+              "
+              type="danger"
+              :icon="useRenderIcon(Delete)"
+              @click="batchDel"
+            >
+              删除
+            </el-button>
+          </Auth>
+          <Auth value="/admin/user/export">
+            <el-button
+              style="
+                padding: 10px 20px 10px 10px;
+                --el-font-size-base: 16px;
+                height: var(--el-component-size);
+              "
+              type="success"
+              :icon="useRenderIcon(AddFill)"
+              @click="exportCheckItem"
+            >
+              导出
+            </el-button>
+          </Auth>
+        </div>
+      </template>
+      <template #centerBens>
+        <div class="flex flex-wrap">
+          <button
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-primary border-primary font-bold border-solid"
           >
-            添加
-          </el-button>
-        </Auth>
-        <Auth value="/admin/user/del">
-          <el-button
-            style="
-              padding: 10px 20px 10px 10px;
-              --el-font-size-base: 16px;
-              height: var(--el-component-size);
-            "
-            type="danger"
-            :icon="useRenderIcon(Delete)"
-            @click="batchDel"
+            全部
+          </button>
+          <button
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
           >
-            删除
-          </el-button>
-        </Auth>
-        <Auth value="/admin/user/export">
-          <el-button
-            style="
-              padding: 10px 20px 10px 10px;
-              --el-font-size-base: 16px;
-              height: var(--el-component-size);
-            "
-            type="success"
-            :icon="useRenderIcon(AddFill)"
-            @click="exportCheckItem"
+            销售线索
+          </button>
+          <button
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
           >
-            导出
-          </el-button>
-        </Auth>
+            销售商机
+          </button>
+          <button
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
+          >
+            项目立项
+          </button>
+          <button
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
+          >
+            项目立项
+          </button>
+          <button
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
+          >
+            合同执行
+          </button>
+          <button
+            class="w-[104px] h-[42px] leading-[42px] text-center bg-bg_color border rounded-[10px] text-[#333333] border-transparent"
+          >
+            售后运维
+          </button>
+        </div>
       </template>
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
@@ -176,17 +217,19 @@ onMounted(() => {
           @page-current-change="handleCurrentChange"
         >
           <template #operation="{ row }">
-            <Auth value="/admin/user/edit">
-              <el-button class="reset-margin" link type="info" :size="size">
-                编辑
-              </el-button>
-            </Auth>
+            <div class="flex gap-3">
+              <Auth value="/admin/user/edit">
+                <el-button class="reset-margin" link type="info" :size="size">
+                  编辑
+                </el-button>
+              </Auth>
 
-            <Auth value="/admin/user/del">
-              <el-button class="reset-margin" link type="danger" :size="size">
-                删除
-              </el-button>
-            </Auth>
+              <Auth value="/admin/user/del">
+                <el-button class="reset-margin" link type="danger" :size="size">
+                  删除
+                </el-button>
+              </Auth>
+            </div>
           </template>
         </pure-table>
       </template>
@@ -195,6 +238,9 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
+.el-button + .el-button {
+  margin-left: 0;
+}
 :deep(.el-dropdown-menu__item i) {
   margin: 0;
 }

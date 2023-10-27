@@ -240,7 +240,7 @@ export default defineComponent({
     return () => (
       <>
         <div {...attrs} class="shadow-1 rounded-[10px] mt-4 p-5 bg-bg_color">
-          <div class="md:flex md:justify-between  w-full  p-0">
+          <div class="flex md:justify-between flex-wrap w-full gap-3 p-0">
             {slots?.buttons ? <div class="flex">{slots.buttons()}</div> : null}
 
             {slots?.centerBens ? (
@@ -252,7 +252,7 @@ export default defineComponent({
             ) : (
               <p class="font-bold truncate">{props.title}</p>
             )} */}
-            <div class="flex md:items-center md:justify-around mt-3 mt-0">
+            <div class="flex md:items-center md:justify-around  ">
               {props.tableRef?.size ? (
                 <>
                   <el-tooltip
