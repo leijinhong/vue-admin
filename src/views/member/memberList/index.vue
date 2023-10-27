@@ -48,9 +48,11 @@ onMounted(() => {
 
 <template>
   <div class="main">
-    <div class="flex justify-between rounded-[10px] shadow-1 bg-bg_color p-5">
+    <div
+      class="md:flex justify-between rounded-[10px] shadow-1 bg-bg_color p-5"
+    >
       <el-form ref="formRef" :inline="true" :model="form" class="search-form">
-        <el-form-item label="" prop="keyword">
+        <el-form-item label="" class="mb-3 md:mt-0" prop="keyword">
           <el-input
             v-model="form.keyword"
             placeholder="项目名称"
@@ -58,7 +60,7 @@ onMounted(() => {
             class="!w-[184px]"
           />
         </el-form-item>
-        <el-form-item label="" prop="is_vip">
+        <el-form-item label="" class="mb-3 md:mt-0" prop="is_vip">
           <el-input
             v-model="form.keyword"
             placeholder="项目编号"
@@ -66,7 +68,7 @@ onMounted(() => {
             class="!w-[204px]"
           />
         </el-form-item>
-        <el-form-item label="" prop="type">
+        <el-form-item label="" class="mb-3 md:mt-0" prop="type">
           <el-select
             v-model="form.type"
             placeholder="客户名称"
@@ -79,7 +81,7 @@ onMounted(() => {
           </el-select>
         </el-form-item>
       </el-form>
-      <div>
+      <div class="">
         <el-button
           style="
             padding: 10px 20px 10px 10px;
@@ -199,7 +201,7 @@ onMounted(() => {
 
 .search-form {
   :deep(.el-form-item) {
-    margin-bottom: 0;
+    // margin-bottom: 0;
   }
 }
 </style>

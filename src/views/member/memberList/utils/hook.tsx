@@ -9,6 +9,7 @@ import { reactive, ref, onMounted, h, toRaw, computed, watch } from "vue";
 import { priceToThousands } from "@pureadmin/utils";
 import { ElMessageBox } from "element-plus";
 import useExecl from "@/hooks/useExecl";
+import { useAppStoreHook } from "@/store/modules/app";
 const { VITE_CONFIG_URL } = import.meta.env;
 
 export function useRole() {
@@ -38,11 +39,17 @@ export function useRole() {
   const { switchStyle } = usePublicHooks();
   const selectList = ref([]);
   // 分页器配置
+  const pageLayout = computed(() => {
+    return useAppStoreHook().device == "mobile"
+      ? "prev,pager,next"
+      : "total, sizes, prev, pager, next, jumper";
+  });
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
     background: true,
+    layout: pageLayout.value,
     pageSizes: [10, 20, 50, 100, 200]
   });
 
