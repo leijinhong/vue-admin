@@ -3,11 +3,11 @@
  -->
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, createVNode } from "vue";
 import { useProject } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
+import ProjectDetail from "@/components/ProjectDetail/index.vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-
 import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
 
 // import Database from "@iconify-icons/ri/database-2-line";
@@ -144,18 +144,25 @@ onMounted(() => {
             </el-button>
           </Auth>
           <Auth value="/admin/user/export">
-            <el-button
-              style="
-                padding: 10px 20px 10px 10px;
-                --el-font-size-base: 16px;
-                height: var(--el-component-size);
-              "
-              type="success"
-              :icon="useRenderIcon('fontisto:export')"
-              @click="exportCheckItem"
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="请选择需要的数据以便导出"
+              placement="top-start"
             >
-              导出
-            </el-button>
+              <el-button
+                style="
+                  padding: 10px 20px 10px 10px;
+                  --el-font-size-base: 16px;
+                  height: var(--el-component-size);
+                "
+                type="success"
+                :icon="useRenderIcon('fontisto:export')"
+                @click="exportCheckItem"
+              >
+                导出
+              </el-button>
+            </el-tooltip>
           </Auth>
         </div>
       </template>
@@ -227,10 +234,11 @@ onMounted(() => {
               <Auth value="/admin/user/edit">
                 <el-button
                   class="reset-margin"
+                  w
                   link
                   type="info"
                   :size="size"
-                  @click="openDialog('查看详情', `<div>123123</div>`)"
+                  @click="openDialog('查看详情', createVNode(ProjectDetail))"
                 >
                   查看
                 </el-button>

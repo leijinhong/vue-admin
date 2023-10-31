@@ -24,7 +24,6 @@ const { VITE_CONFIG_URL } = import.meta.env;
 
 export function useProject() {
   const selectValue = ref("name");
-
   /**
    * @description               搜索表单数据
    * @param project_name        项目名称
@@ -192,7 +191,7 @@ export function useProject() {
     useExecl(columns, selectList.value);
   };
   // 打开查看详情弹窗
-  const openDialog = (str: String, VNode: String) => {
+  const openDialog = (str: String, VNode: any) => {
     addDialog({
       hideFooter: true,
       showClose: false,
@@ -221,7 +220,7 @@ export function useProject() {
           <hr style="color: #cccccc" />
         </div>
       ),
-      contentRenderer: () => <div v-html={VNode}></div>
+      contentRenderer: () => <div>{VNode}</div>
     });
   };
 
