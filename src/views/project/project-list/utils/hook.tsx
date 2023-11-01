@@ -1,6 +1,6 @@
 import { message } from "@/utils/message";
 import { getProjectList } from "@/api/project";
-import { addDialog, closeDialog } from "@/components/ReDialog";
+import { DialogOptions, addDialog, closeDialog } from "@/components/ReDialog";
 import { type PaginationProps } from "@pureadmin/table";
 import { Close } from "@element-plus/icons-vue";
 //引入编辑项目页面
@@ -181,11 +181,16 @@ export function useProject() {
   };
   // 打开弹窗,传入对应的组件
   const openDialog = (str: string, VNode: any) => {
-    alAddDialog(str, VNode, res => {
+    alAddDialog(str, VNode, {}, res => {
       console.log(res);
     });
   };
-  function alAddDialog(str: string, VNode: any, cb: Function) {
+  function alAddDialog(
+    str: string,
+    VNode: any,
+    options: DialogOptions,
+    cb: Function
+  ) {
     addDialog({
       // showClose: false,
       width: "calc(100% - 320px - 180px)",
@@ -238,7 +243,8 @@ export function useProject() {
             closeDialog(options, index);
           }
         }
-      ]
+      ],
+      ...options
     });
   }
   function handleClose({ options, index }) {
