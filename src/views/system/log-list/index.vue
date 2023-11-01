@@ -1,5 +1,5 @@
 <!-- 
-  会员列表
+  日志
  -->
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
@@ -16,7 +16,7 @@ import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
 
 defineOptions({
-  name: "memberList"
+  name: "log-list"
 });
 
 const formRef = ref();

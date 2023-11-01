@@ -10,6 +10,6 @@ interface ResultType<T> {
 }
 
 interface ResultDataType<T> {
-  data: T;
+  items: T;
   total: number;
 }

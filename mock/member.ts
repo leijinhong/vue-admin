@@ -10,7 +10,7 @@ export default [
       return {
         code: 0,
         data: {
-          data: [
+          items: [
             ...new Array(LENGTH).fill(null).map((_, id) => ({
               // 编号
               id: id,

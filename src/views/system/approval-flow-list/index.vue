@@ -1,5 +1,5 @@
 <!-- 
-  会员列表
+  审批流
  -->
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
@@ -11,7 +11,7 @@ import AddFill from "@iconify-icons/ri/add-circle-line";
 import { useFloePathStoreHook } from "@/store/modules/flowPath";
 
 defineOptions({
-  name: "memberList"
+  name: "approval-flow-list"
 });
 
 const {

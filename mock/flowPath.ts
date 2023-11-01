@@ -1,7 +1,7 @@
 import { MockMethod } from "vite-plugin-mock";
 
 export default [
-  // 会员列表
+  // 审批流
   {
     url: "/admin/flow/path",
     method: "post",
@@ -10,7 +10,7 @@ export default [
       return {
         code: 0,
         data: {
-          data: [
+          items: [
             ...new Array(LENGTH).fill(null).map((_, id) => ({
               id: id,
               event: Math.floor(Math.random() * 5),

@@ -195,7 +195,7 @@ export function useHook() {
         [selectValue.value]: form["keyword"]
       })
     );
-    dataList.value = data.data;
+    dataList.value = data.items;
     pagination.total = data.total || 0;
     pagination.currentPage = page;
 

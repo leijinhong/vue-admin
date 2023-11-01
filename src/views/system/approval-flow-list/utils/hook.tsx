@@ -161,7 +161,7 @@ export function useHook() {
         page: page
       })
     );
-    dataList.value = data.data
+    dataList.value = data.items
       .sort((a, b) => a.level - b.level)
       .sort((a, b) => (a.event as number) - (b.event as number));
 
