@@ -3,7 +3,7 @@
  -->
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRole } from "./utils/hook";
+import { useHook } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
@@ -39,7 +39,7 @@ const {
   handleSelectionChange,
   exportCheckItem,
   batchDel
-} = useRole();
+} = useHook();
 
 onMounted(() => {
   onSearch();

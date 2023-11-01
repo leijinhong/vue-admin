@@ -1,120 +1,121 @@
-import dayjs from "dayjs";
-import editForm from "../form.vue";
 import { message } from "@/utils/message";
-import { getMemberList } from "@/api/member";
-import { usePublicHooks } from "../../hooks";
-import { addDialog } from "@/components/ReDialog";
+import { getFlowPath } from "@/api/flowPath";
 import { type PaginationProps } from "@pureadmin/table";
-import { reactive, ref, onMounted, h, toRaw, computed, watch } from "vue";
-import { priceToThousands } from "@pureadmin/utils";
+import { reactive, ref, toRaw, watch, computed } from "vue";
 import { ElMessageBox } from "element-plus";
 import useExecl from "@/hooks/useExecl";
-const { VITE_CONFIG_URL } = import.meta.env;
+import { useAppStoreHook } from "@/store/modules/app";
+import { useFloePathStoreHook } from "@/store/modules/flowPath";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
+import { string } from "vue-types";
 
-export function useRole() {
+export function useHook() {
   const selectValue = ref("name");
 
-  /**
-   * @description 搜索表单数据
-   * @param is_vip              是否vip会员
-   * @param type                会员类型
-   * @param smrz                是否实名认证
-   * @param phone               手机 phone/会员编号code/名称name 搜索
-   * @param code
-   * @param name
-   */
-  const form = reactive({
-    is_vip: null,
-    type: null,
-    smrz: null,
-    keyword: ""
-  });
   /** 控制详情抽屉 */
   const drawer = ref(false);
-  const formRef = ref();
-  const dataList = ref([]);
+  const dataList = ref<FlowPathType[]>([]);
   const loading = ref(true);
-  const switchLoadMap = ref({});
-  const { switchStyle } = usePublicHooks();
   const selectList = ref([]);
+  const eventList = useFloePathStoreHook().getEventList;
+
+  /** 未选事件 */
+  const unSelectedEvent = computed(() => {
+    const events = dataList.value.map(i => i.event);
+    return eventList.filter(item => !events.includes(item.value));
+  });
+
   // 分页器配置
   const pagination = reactive<PaginationProps>({
     total: 0,
-    pageSize: 10,
+    pageSize: 1000,
     currentPage: 1,
     background: true,
+    layout: "",
     pageSizes: [10, 20, 50, 100, 200]
   });
 
-  // 会员列表表格内容
+  // 表格内容
   const columns: TableColumnList = [
     {
       type: "selection",
-      align: "left"
+      align: "left",
+      prop: "event"
       // width: 50
     },
     {
-      label: "会员编号",
-      prop: "id",
-      width: 120
-    },
-    {
-      label: "昵称",
-      prop: "name",
-      cellRenderer: scope => <div>{scope.row.name || scope.row.nickname}</div>
-    },
-    {
-      label: "手机号码",
-      prop: "phone",
-      width: 150
-    },
-    {
-      label: "所在地区",
-      prop: "resumeInfo.site"
-    },
-    {
-      label: "会员类型",
-      prop: "type",
-      cellRenderer: scope => <div>{scope.row.type}</div>
-    },
-    {
-      label: "VIP会员",
-      prop: "is_vip",
-      cellRenderer: scope => <div>{scope.row.is_vip == 1 ? "是" : "否"}</div>
-    },
-    {
-      label: "会员状态",
-      prop: "status",
+      label: "审批事件",
+      prop: "event",
       cellRenderer: scope => (
-        <el-switch
-          size={scope.props.size}
-          loading={switchLoadMap.value[scope.index]?.loading}
-          model-value={scope.row.status}
-          active-value={1}
-          inactive-value={2}
-          active-text="已启用"
-          inactive-text="已停用"
-          inline-prompt
-          style={switchStyle.value}
-        />
+        <>
+          {scope.row.editing && typeof scope.row.event == "string" ? (
+            <el-select
+              placeholder="请选择审批事件"
+              clearable
+              suffix-icon={useRenderIcon(CaretBottom)}
+              onChange={event => handleSelect(event, scope.row)}
+            >
+              {unSelectedEvent.value.map(i => (
+                <el-option label={i.label} value={i.value} />
+              ))}
+            </el-select>
+          ) : (
+            <div>{eventList[scope.row.event].label}</div>
+          )}
+        </>
       ),
+      width: 380
+    },
+    {
+      label: "审批级别",
+      prop: "level",
       width: 100
     },
     {
-      label: "注册时间",
-      prop: "registerTime",
-      width: 180
+      label: "审核人",
+      slot: "reviewed"
     },
     {
       label: "操作",
       fixed: "right",
       slot: "operation",
-      width: 150
+      prop: "event",
+      width: 280
     }
   ];
 
-  function handleDelete(row) {
-    message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
+  function handleAdd(row?: FlowPathType) {
+    if (!row) {
+      dataList.value.push({
+        id: +new Date(),
+        event: +new Date() + "",
+        level: 1,
+        reviewedBy: "",
+        editing: true
+      });
+    } else {
+      let index = dataList.value.findIndex(i => i.id == row.id);
+      dataList.value.splice(index + 1, 0, {
+        ...dataList.value[index],
+        reviewedBy: ""
+      });
+    }
+  }
+
+  function handleSelect(event, row: FlowPathType) {
+    console.log(event);
+
+    dataList.value.forEach(i => {
+      if (i.id == row.id) {
+        i.event = event;
+        i.editing = true;
+      }
+    });
+  }
+
+  function handleDelete(row: FlowPathType) {
+    message(`您删除了id为${row.id}的这条数据`, { type: "success" });
     onSearch(pagination.currentPage);
   }
 
@@ -125,59 +126,111 @@ export function useRole() {
   }
 
   function handleCurrentChange(val: number) {
-    // console.log(`current page: ${val}`);
     onSearch(val);
   }
 
-  function handleSelectionChange(val) {
-    selectList.value = val;
+  function handleSelectionChange(val: FlowPathType[]) {
+    selectList.value = val.map(i => i.id);
+  }
+
+  function batchDel() {
+    if (selectList.value.length == 0) {
+      message("请选择要删除的数据", { type: "warning" });
+    } else {
+      ElMessageBox.confirm(
+        "选中数据id为" + selectList.value.join() + "，确认要删除这些数据吗？",
+        "删除提示",
+        {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(() => {
+          handleDelete({ id: selectList.value.join() } as any);
+        })
+        .catch(() => {});
+    }
   }
 
   async function onSearch(page = 1) {
     loading.value = true;
-    const { is_vip, smrz, type } = form;
-    const { data } = await getMemberList(
+    const { data } = await getFlowPath(
       toRaw({
         limit: pagination.pageSize,
-        page: page,
-        is_vip,
-        smrz,
-        type,
-        [selectValue.value]: form["keyword"]
+        page: page
       })
     );
-    dataList.value = data.data;
+    dataList.value = data.data
+      .sort((a, b) => a.level - b.level)
+      .sort((a, b) => (a.event as number) - (b.event as number));
+
     pagination.total = data.total || 0;
     pagination.currentPage = page;
 
     loading.value = false;
   }
 
-  const resetForm = formEl => {
-    if (!formEl) return;
-    formEl.resetFields();
-    onSearch();
-  };
-
-  const exportCheckItem = () => {
+  function exportCheckItem() {
     useExecl(columns, selectList.value);
-  };
+  }
+
+  function objectSpanMethod({
+    column,
+    rowIndex,
+    columnIndex
+  }: SpanMethodProps) {
+    if (
+      columnIndex === 0 ||
+      columnIndex === 1 ||
+      columnIndex == columns.length - 1
+    ) {
+      var spanArr = getSpanArr(dataList.value, column.property);
+      const _row = spanArr[rowIndex]; //合并
+      const _col = _row > 0 ? 1 : 0;
+
+      return {
+        rowspan: _row,
+        colspan: _col
+      };
+    }
+  }
+  function getSpanArr(data: FlowPathType[], spanKey: string) {
+    var spanArr = []; //合并数组
+    var pos = 0; //位置
+    for (var i = 0; i < data.length; i++) {
+      if (i === 0) {
+        spanArr.push(1);
+        pos = 0;
+      } else {
+        if (data[i][spanKey] === data[i - 1][spanKey]) {
+          // 判断当前元素与上一个元素是否相同
+          spanArr[pos] += 1;
+          spanArr.push(0);
+        } else {
+          spanArr.push(1);
+          pos = i;
+        }
+      }
+    }
+    return spanArr;
+  }
   return {
     selectValue,
-    form,
     loading,
     columns,
     dataList,
     pagination,
     drawer,
-    // buttonClass,
+    eventList,
+    handleAdd,
     onSearch,
-    resetForm,
     handleDelete,
-    // handleDatabase,
+    objectSpanMethod,
     handleSizeChange,
     handleCurrentChange,
     handleSelectionChange,
-    exportCheckItem
+    exportCheckItem,
+    batchDel
   };
 }

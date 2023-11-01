@@ -21,7 +21,7 @@ import useExecl from "@/hooks/useExecl";
 import { useAppStoreHook } from "@/store/modules/app";
 const { VITE_CONFIG_URL } = import.meta.env;
 
-export function useRole() {
+export function useHook() {
   const selectValue = ref("name");
 
   /**
