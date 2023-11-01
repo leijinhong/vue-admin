@@ -4,7 +4,7 @@
  * 接口返回类型
  */
 interface ResultType<T> {
-  code: 0 | 1;
+  code: 0 | 1 | -1;
   data: T;
   msg: string;
 }
