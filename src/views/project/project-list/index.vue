@@ -1,30 +1,21 @@
-<!-- 
-  项目列表
- -->
+<!-- 项目列表 -->
 
 <script setup lang="ts">
 import { ref, onMounted, createVNode } from "vue";
 import { useProject } from "./utils/hook";
-import { PureTableBar } from "@/components/RePureTableBar";
-import ProjectDetail from "@/components/ProjectDetail/index.vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
-
-// import Database from "@iconify-icons/ri/database-2-line";
-// import More from "@iconify-icons/ep/more-filled";
 import Delete from "@iconify-icons/ep/delete";
-import EditPen from "@iconify-icons/ep/edit-pen";
 import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
-
-import { defineComponent } from "vue";
-
+import { PureTableBar } from "@/components/RePureTableBar";
+import ProjectDetail from "@/components/ProjectDetail/index.vue";
+import ProjectEdit from "@/components/ProjectEdit/index.vue";
 defineOptions({
-  name: "memberList"
+  name: "projectList"
 });
 
-const formRef = ref();
 const {
   selectValue,
   form,
@@ -39,7 +30,8 @@ const {
   handleSelectionChange,
   exportCheckItem,
   batchDel,
-  openDialog
+  openDialog,
+  formRef
 } = useProject();
 
 onMounted(() => {
@@ -227,7 +219,13 @@ onMounted(() => {
           <template #operation="{ row }">
             <div class="flex gap-3 justify-center">
               <Auth value="/admin/user/edit">
-                <el-button class="reset-margin" link type="info" :size="size">
+                <el-button
+                  class="reset-margin"
+                  link
+                  type="info"
+                  :size="size"
+                  @click="openDialog('编辑项目', ProjectEdit)"
+                >
                   编辑
                 </el-button>
               </Auth>
@@ -238,7 +236,7 @@ onMounted(() => {
                   link
                   type="info"
                   :size="size"
-                  @click="openDialog('查看详情', createVNode(ProjectDetail))"
+                  @click="openDialog('查看详情', ProjectDetail)"
                 >
                   查看
                 </el-button>
@@ -270,31 +268,4 @@ onMounted(() => {
   }
 }
 </style>
-<style lang="scss">
-.project-dialog {
-  header {
-    padding-bottom: 0;
-    margin-right: 0;
-  }
-  .el-dialog__body {
-    padding-top: 0;
-    padding-bottom: 20px;
-  }
-}
-.project-tabs {
-  .el-tabs__header {
-    height: 66px;
-  }
-  .el-tabs__nav-wrap {
-    .el-tabs__nav-scroll {
-      height: 66px;
-      .el-tabs__nav {
-        height: 45px;
-        .el-tabs__item {
-          height: 60px;
-        }
-      }
-    }
-  }
-}
-</style>
+<style lang="scss"></style>

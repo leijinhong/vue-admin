@@ -37,7 +37,7 @@
     </div>
     <div>
       <p class="my-5">产品：</p>
-      <div>
+      <div style="border-bottom: 1px solid #cccccc">
         <pure-table
           align-whole="center"
           :header-cell-style="{
@@ -56,7 +56,7 @@
     </div>
     <div>
       <p class="my-5">交付计划：</p>
-      <div>
+      <div style="border-bottom: 1px solid #cccccc">
         <pure-table
           align-whole="center"
           :header-cell-style="{
@@ -72,22 +72,36 @@
         </pure-table>
       </div>
     </div>
+    <div>
+      <p class="my-5">合同附件：</p>
+      <p
+        @click="
+          downloadByUrl(
+            'https://github.com/xiaoxian521/xiaoxian521/archive/refs/heads/main.zip',
+            'xiaoxian521.zip'
+          )
+        "
+        class="text-primary cursor-pointer"
+      >
+        销售产品说明书.DOC
+      </p>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import { downloadByUrl } from "@pureadmin/utils";
 import { onMounted } from "vue";
 import { getProjectDetail } from "@/api/project";
 import { reactive, ref } from "vue";
 import dayjs from "dayjs";
-
 export default {
   setup() {
     let detailInfo = reactive({
       list: []
     }); //项目详情的基本信息
 
-    function onGetProjectDetail(id) {
+    function fetchProjectDetail(id) {
       getProjectDetail({ id: id }).then(res => {
         const { data } = res;
         detailInfo.list = [
@@ -317,14 +331,15 @@ export default {
       }
     ];
     onMounted(() => {
-      onGetProjectDetail(49);
+      fetchProjectDetail(49);
     });
     return {
       detailInfo,
       tableData,
       columns,
       tableData2,
-      columns2
+      columns2,
+      downloadByUrl
     };
   }
 };

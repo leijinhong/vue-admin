@@ -101,6 +101,10 @@ type ButtonProps = {
   dark?: boolean;
   /** 自定义元素标签 */
   tag?: string | Component;
+  /*** Style */
+  style?:{
+    [key in string]:string
+  },
   /** 点击按钮后触发的回调 */
   btnClick?: ({
     dialog,

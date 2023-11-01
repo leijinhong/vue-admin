@@ -1,28 +1,19 @@
-import dayjs from "dayjs";
-import editForm from "../form.vue";
 import { message } from "@/utils/message";
 import { getProjectList } from "@/api/project";
-import { usePublicHooks } from "../../hooks";
-import { addDialog } from "@/components/ReDialog";
+import { addDialog, closeDialog } from "@/components/ReDialog";
 import { type PaginationProps } from "@pureadmin/table";
 import { Close } from "@element-plus/icons-vue";
-import {
-  reactive,
-  ref,
-  onMounted,
-  h,
-  toRaw,
-  computed,
-  watch,
-  watchEffect
-} from "vue";
-import { priceToThousands } from "@pureadmin/utils";
+//引入编辑项目页面
+import ProjectEdit from "@/components/ProjectEdit/index.vue";
+
+import { reactive, ref, h, toRaw, watch } from "vue";
 import { ElMessageBox } from "element-plus";
 import useExecl from "@/hooks/useExecl";
 import { useAppStoreHook } from "@/store/modules/app";
 const { VITE_CONFIG_URL } = import.meta.env;
 
 export function useProject() {
+  const formRef = ref();
   const selectValue = ref("name");
   /**
    * @description               搜索表单数据
@@ -32,6 +23,7 @@ export function useProject() {
    * @param customer_manager    客户经理即负责人ID
    * @param stage               项目阶段ID
    */
+  /** 列表页的筛选表单 */
   const form = reactive({
     project_name: "",
     encode: "",
@@ -39,13 +31,11 @@ export function useProject() {
     customer_manager: null,
     stage: null
   });
-  /** 控制详情抽屉 */
   const dataList = ref([]);
   const loading = ref(true);
   const switchLoadMap = ref({});
-  const { switchStyle } = usePublicHooks();
   const selectList = ref([]);
-  /* 分页器 */
+  /** 分页器 */
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
@@ -67,7 +57,7 @@ export function useProject() {
     }
   );
 
-  // 项目列表表格内容
+  // 项目列表表头与对应的内容
   const columns: TableColumnList = [
     {
       type: "selection",
@@ -127,17 +117,17 @@ export function useProject() {
     message(`您删除了角色名称为${row.id}的这条数据`, { type: "success" });
     onSearch(pagination.currentPage);
   }
-
+  // XX条/页变化
   function handleSizeChange(val: number) {
     pagination.currentPage = 1;
     pagination.pageSize = val;
     onSearch();
   }
-
+  //当前页变化
   function handleCurrentChange(val: number) {
     onSearch(val);
   }
-
+  //当选择项发生变化时会触发该事件
   function handleSelectionChange(val) {
     selectList.value = val;
   }
@@ -173,10 +163,9 @@ export function useProject() {
         [selectValue.value]: form["keyword"]
       })
     );
-    dataList.value = data.data;
+    dataList.value = data.items;
     pagination.total = data.total || 0;
     pagination.currentPage = page;
-
     loading.value = false;
   }
   //重置表单
@@ -190,40 +179,72 @@ export function useProject() {
   const exportCheckItem = () => {
     useExecl(columns, selectList.value);
   };
-  // 打开查看详情弹窗
-  const openDialog = (str: String, VNode: any) => {
-    addDialog({
-      hideFooter: true,
-      showClose: false,
-      width: "calc(100% - 320px - 180px)",
-      style: {
-        marginRight: "90px",
-        borderRadius: "10px",
-        boxShadow: "2px 2px 16px 1px rgba(62, 62, 62, 0.12)"
-      },
-      class: "project-dialog",
-      headerRenderer: ({ close, titleId, titleClass }) => (
-        <div id={titleId} class={titleClass + " my-header"}>
-          <div class="flex justify-between mb-5">
-            <span style="color: #111" class="text-16 font-bold">
-              {str}
-            </span>
-            <el-icon
-              class="cursor-pointer"
-              onClick={() => {
-                close();
-              }}
-            >
-              <Close style="width: 17px; height: 17px; color: #999" />
-            </el-icon>
-          </div>
-          <hr style="color: #cccccc" />
-        </div>
-      ),
-      contentRenderer: () => <div>{VNode}</div>
+  // 打开弹窗,传入对应的组件
+  const openDialog = (str: string, VNode: any) => {
+    alAddDialog(str, VNode, res => {
+      console.log(res);
     });
   };
+  function alAddDialog(str: string, VNode: any, cb: Function) {
+    addDialog({
+      // showClose: false,
+      width: "calc(100% - 320px - 180px)",
+      /* 自定义表头 */
+      title: str,
+      /* 自定义内容 */
+      contentRenderer: () => <VNode ref={formRef}></VNode>,
+      /* 自定义底部 */
+      footerButtons: [
+        {
+          label: "提交",
+          size: "large",
+          style: {
+            width: "192px"
+          },
+          type: "primary",
+          btnClick: ({ dialog: { options, index }, button }) => {
+            console.log(options, index, button);
+            cb(1);
+            closeDialog(options, index);
+          }
+        },
 
+        {
+          label: "保存后继续编辑",
+          size: "large",
+          type: "primary",
+          style: {
+            width: "192px"
+          },
+          btnClick: ({ dialog: { options, index }, button }) => {
+            console.log(options, index, button);
+            cb(1);
+            closeDialog(options, index);
+          }
+        },
+
+        {
+          label: "重置",
+          size: "large",
+          type: "danger",
+          style: {
+            width: "112px",
+            background: "#fff",
+            color: "#F33D3D"
+          },
+          btnClick: ({ dialog: { options, index }, button }) => {
+            console.log(options, index, button);
+            cb(1);
+            closeDialog(options, index);
+          }
+        }
+      ]
+    });
+  }
+  function handleClose({ options, index }) {
+    console.log(formRef.value.getRef());
+    closeDialog(options, index);
+  }
   return {
     selectValue,
     form,
@@ -241,6 +262,7 @@ export function useProject() {
     handleSelectionChange,
     exportCheckItem,
     batchDel,
-    openDialog
+    openDialog,
+    formRef
   };
 }

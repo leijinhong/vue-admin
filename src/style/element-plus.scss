@@ -1,3 +1,29 @@
+.el-dialog{
+  margin-right :90px !important;
+  border-radius: 10px !important;
+  box-shadow: 2px 2px 16px 1px rgba(62, 62, 62, 0.12) !important;
+}
+.el-dialog__body {
+  padding-top: 0 !important;
+  padding-bottom: 20px !important;
+}
+.el-dialog__footer{
+  text-align: center !important;
+}
+.el-dialog__header{
+  margin: 0 20px !important;
+    padding: 20px 0 !important;border-bottom: 1px solid #ccc;
+}
+.el-dialog__title{
+  font-size: 16px;
+    color: #111111;
+    font-weight: bold;
+}
+.el-dialog__headerbtn .el-dialog__close{
+  color: #999;
+  font-size: 25px !important;
+}
+
 .el-table th.el-table__cell.is-leaf {
   background-color: #f0f0f0;
 }
