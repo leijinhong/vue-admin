@@ -1,5 +1,21 @@
-.el-dialog{
-  margin-right :90px !important;
+@media screen and (max-width: 991px) {
+  // .el-scrollbar__wrap {
+  //   background-color: red;
+  // }
+  .el-overlay-dialog {
+    padding-left: 0 !important;
+  }
+  html body #app .el-sub-menu .el-sub-menu__title {
+    padding: 0 !important;
+  }
+}
+
+.el-overlay-dialog {
+  padding-left: 320px;
+}
+.el-dialog {
+  // margin: 0 calc(320 + auto) !important;
+  // margin-right :90px !important;
   border-radius: 10px !important;
   box-shadow: 2px 2px 16px 1px rgba(62, 62, 62, 0.12) !important;
 }
@@ -7,19 +23,20 @@
   padding-top: 0 !important;
   padding-bottom: 20px !important;
 }
-.el-dialog__footer{
+.el-dialog__footer {
   text-align: center !important;
 }
-.el-dialog__header{
+.el-dialog__header {
   margin: 0 20px !important;
-    padding: 20px 0 !important;border-bottom: 1px solid #ccc;
+  padding: 20px 0 !important;
+  border-bottom: 1px solid #ccc;
 }
-.el-dialog__title{
+.el-dialog__title {
   font-size: 16px;
-    color: #111111;
-    font-weight: bold;
+  color: #111111;
+  font-weight: bold;
 }
-.el-dialog__headerbtn .el-dialog__close{
+.el-dialog__headerbtn .el-dialog__close {
   color: #999;
   font-size: 25px !important;
 }

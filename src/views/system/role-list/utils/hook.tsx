@@ -1,50 +1,52 @@
-import dayjs from "dayjs";
-import editForm from "../form.vue";
 import { message } from "@/utils/message";
 import { getMemberList } from "@/api/member";
-import { usePublicHooks } from "../../hooks";
-import { addDialog } from "@/components/ReDialog";
 import { type PaginationProps } from "@pureadmin/table";
-import { reactive, ref, onMounted, h, toRaw, computed, watch } from "vue";
-import { priceToThousands } from "@pureadmin/utils";
+import {
+  reactive,
+  ref,
+  onMounted,
+  h,
+  toRaw,
+  computed,
+  watch,
+  watchEffect
+} from "vue";
 import { ElMessageBox } from "element-plus";
-import useExecl from "@/hooks/useExecl";
-const { VITE_CONFIG_URL } = import.meta.env;
+import { useAppStoreHook } from "@/store/modules/app";
 
 export function useRole() {
-  const selectValue = ref("name");
-
   /**
    * @description 搜索表单数据
-   * @param is_vip              是否vip会员
-   * @param type                会员类型
-   * @param smrz                是否实名认证
-   * @param phone               手机 phone/会员编号code/名称name 搜索
-   * @param code
-   * @param name
    */
   const form = reactive({
-    is_vip: null,
     type: null,
-    smrz: null,
     keyword: ""
   });
   /** 控制详情抽屉 */
-  const drawer = ref(false);
-  const formRef = ref();
   const dataList = ref([]);
   const loading = ref(true);
-  const switchLoadMap = ref({});
-  const { switchStyle } = usePublicHooks();
   const selectList = ref([]);
-  // 分页器配置
+
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
     background: true,
+    layout: "",
     pageSizes: [10, 20, 50, 100, 200]
   });
+  watch(
+    () => useAppStoreHook().device,
+    n => {
+      pagination.layout =
+        n == "mobile"
+          ? "prev,pager,next"
+          : "total, sizes, prev, pager, next, jumper";
+    },
+    {
+      immediate: true
+    }
+  );
 
   // 会员列表表格内容
   const columns: TableColumnList = [
@@ -83,24 +85,6 @@ export function useRole() {
       cellRenderer: scope => <div>{scope.row.is_vip == 1 ? "是" : "否"}</div>
     },
     {
-      label: "会员状态",
-      prop: "status",
-      cellRenderer: scope => (
-        <el-switch
-          size={scope.props.size}
-          loading={switchLoadMap.value[scope.index]?.loading}
-          model-value={scope.row.status}
-          active-value={1}
-          inactive-value={2}
-          active-text="已启用"
-          inactive-text="已停用"
-          inline-prompt
-          style={switchStyle.value}
-        />
-      ),
-      width: 100
-    },
-    {
       label: "注册时间",
       prop: "registerTime",
       width: 180
@@ -114,7 +98,7 @@ export function useRole() {
   ];
 
   function handleDelete(row) {
-    message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
+    message(`您删除了角色名称为${row.id}的这条数据`, { type: "success" });
     onSearch(pagination.currentPage);
   }
 
@@ -133,20 +117,36 @@ export function useRole() {
     selectList.value = val;
   }
 
+  const batchDel = () => {
+    if (selectList.value.length == 0) {
+      message("请选择要删除的数据", { type: "warning" });
+    } else {
+      ElMessageBox.confirm(
+        "选中数据id为" + selectList.value.join() + "，确认要删除这些数据吗？",
+        "删除提示",
+        {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(() => {
+          handleDelete({ id: selectList.value.join() } as any);
+        })
+        .catch(() => {});
+    }
+  };
+
   async function onSearch(page = 1) {
     loading.value = true;
-    const { is_vip, smrz, type } = form;
     const { data } = await getMemberList(
       toRaw({
         limit: pagination.pageSize,
         page: page,
-        is_vip,
-        smrz,
-        type,
-        [selectValue.value]: form["keyword"]
+        [form.type]: form["keyword"]
       })
     );
-    dataList.value = data.data;
+    dataList.value = data.items;
     pagination.total = data.total || 0;
     pagination.currentPage = page;
 
@@ -159,17 +159,12 @@ export function useRole() {
     onSearch();
   };
 
-  const exportCheckItem = () => {
-    useExecl(columns, selectList.value);
-  };
   return {
-    selectValue,
     form,
     loading,
     columns,
     dataList,
     pagination,
-    drawer,
     // buttonClass,
     onSearch,
     resetForm,
@@ -178,6 +173,6 @@ export function useRole() {
     handleSizeChange,
     handleCurrentChange,
     handleSelectionChange,
-    exportCheckItem
+    batchDel
   };
 }

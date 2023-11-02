@@ -8,7 +8,10 @@ module.exports = {
   theme: {
     extend: {
       boxShadow: {
-        '1': '0px 2px 8px 1px rgba(51,51,51,0.16)'
+        1: "0px 2px 8px 1px rgba(51,51,51,0.16)"
+      },
+      padding: {
+        90: "360px"
       },
       colors: {
         bg_color: "var(--el-bg-color)",

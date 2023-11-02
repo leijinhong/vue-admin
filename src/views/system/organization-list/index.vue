@@ -32,6 +32,15 @@ defineOptions({
           新增
         </el-button>
       </Auth>
+      <Auth value="/admin/user/add">
+        <el-button
+          type="primary"
+          :icon="useRenderIcon(AddFill)"
+          @click="openDialog('新增', { pid: 0 })"
+        >
+          导入
+        </el-button>
+      </Auth>
     </div>
     <el-tree
       :data="dataSource"
