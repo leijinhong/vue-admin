@@ -74,14 +74,15 @@ export function useHook() {
     },
     {
       label: "审核人",
-      slot: "reviewed"
+      slot: "reviewed",
+      minWidth: 300
     },
     {
       label: "操作",
       fixed: "right",
       slot: "operation",
       prop: "event",
-      width: 280
+      width: 200
     }
   ];
 

@@ -1,3 +1,6 @@
+.el-table__body tr.hover-row > td.el-table__cell {
+  background-color: var(--el-table-row-hover-bg-color) !important;
+}
 @media screen and (max-width: 991px) {
   // .el-scrollbar__wrap {
   //   background-color: red;
@@ -133,7 +136,7 @@
   .el-input__inner {
     font-size: 16px;
     &::placeholder {
-      color: #666666;
+      // color: #666666;
     }
   }
 }

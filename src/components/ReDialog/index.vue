@@ -55,7 +55,8 @@ const fullscreenClass = computed(() => {
   return [
     "el-icon",
     "el-dialog__close",
-    "-translate-x-2",
+    "text-lg",
+    "-translate-x-6",
     "cursor-pointer",
     "hover:!text-[red]"
   ];

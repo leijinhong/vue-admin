@@ -46,7 +46,7 @@ onMounted(() => {
       class="md:flex justify-between rounded-[10px] shadow-1 bg-bg_color p-5"
     >
       <el-form ref="formRef" :inline="true" :model="form" class="search-form">
-        <el-form-item label="" class="mb-3 md:mt-0" prop="keyword">
+        <el-form-item label="" class="!mb-0 md:mt-0" prop="keyword">
           <div>
             <el-select
               v-model="form.type"
@@ -72,7 +72,7 @@ onMounted(() => {
           </div>
         </el-form-item>
       </el-form>
-      <div class="flex gap-x-3 gap-y-3">
+      <div class="flex mt-3 md:mt-0 gap-x-3 gap-y-3">
         <el-button
           style="
             padding: 10px 20px 10px 10px;

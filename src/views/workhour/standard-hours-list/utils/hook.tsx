@@ -1,50 +1,68 @@
 import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { message } from "@/utils/message";
-import { getMemberList } from "@/api/member";
+import { getUserList } from "@/api/user";
 import { usePublicHooks } from "../../hooks";
-import { addDialog } from "@/components/ReDialog";
+import { DialogOptions, addDialog, closeDialog } from "@/components/ReDialog";
 import { type PaginationProps } from "@pureadmin/table";
-import { reactive, ref, onMounted, h, toRaw, computed, watch } from "vue";
-import { priceToThousands } from "@pureadmin/utils";
+import {
+  reactive,
+  ref,
+  onMounted,
+  h,
+  toRaw,
+  computed,
+  watch,
+  watchEffect
+} from "vue";
+import { cloneDeep, priceToThousands } from "@pureadmin/utils";
 import { ElMessageBox } from "element-plus";
 import useExecl from "@/hooks/useExecl";
+import { useAppStoreHook } from "@/store/modules/app";
 const { VITE_CONFIG_URL } = import.meta.env;
 
-export function useRole() {
+export function useHook() {
   const selectValue = ref("name");
 
   /**
    * @description 搜索表单数据
-   * @param is_vip              是否vip会员
-   * @param type                会员类型
-   * @param smrz                是否实名认证
-   * @param phone               手机 phone/会员编号code/名称name 搜索
-   * @param code
-   * @param name
    */
   const form = reactive({
-    is_vip: null,
-    type: null,
-    smrz: null,
-    keyword: ""
+    nickname: "",
+    role: -1,
+    time: 0
   });
   /** 控制详情抽屉 */
   const drawer = ref(false);
   const formRef = ref();
-  const dataList = ref([]);
+  const dataList = ref<UserItemType[]>();
   const loading = ref(true);
   const switchLoadMap = ref({});
   const { switchStyle } = usePublicHooks();
   const selectList = ref([]);
+  const isSearch = ref(false);
+
   // 分页器配置
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
     background: true,
+    layout: "",
     pageSizes: [10, 20, 50, 100, 200]
   });
+  watch(
+    () => useAppStoreHook().device,
+    n => {
+      pagination.layout =
+        n == "mobile"
+          ? "prev,pager,next"
+          : "total, sizes, prev, pager, next, jumper";
+    },
+    {
+      immediate: true
+    }
+  );
 
   // 会员列表表格内容
   const columns: TableColumnList = [
@@ -54,36 +72,25 @@ export function useRole() {
       // width: 50
     },
     {
-      label: "会员编号",
-      prop: "id",
+      label: "事件编号",
+      prop: "number",
       width: 120
     },
     {
-      label: "昵称",
-      prop: "name",
-      cellRenderer: scope => <div>{scope.row.name || scope.row.nickname}</div>
+      label: "事件名称",
+      prop: "username"
     },
     {
-      label: "手机号码",
-      prop: "phone",
-      width: 150
+      label: "标准工时（H）",
+      prop: "nickname"
     },
     {
-      label: "所在地区",
-      prop: "resumeInfo.site"
+      label: "备注",
+      prop: "post"
     },
+
     {
-      label: "会员类型",
-      prop: "type",
-      cellRenderer: scope => <div>{scope.row.type}</div>
-    },
-    {
-      label: "VIP会员",
-      prop: "is_vip",
-      cellRenderer: scope => <div>{scope.row.is_vip == 1 ? "是" : "否"}</div>
-    },
-    {
-      label: "会员状态",
+      label: "状态",
       prop: "status",
       cellRenderer: scope => (
         <el-switch
@@ -92,17 +99,23 @@ export function useRole() {
           model-value={scope.row.status}
           active-value={1}
           inactive-value={2}
-          active-text="已启用"
-          inactive-text="已停用"
+          active-text="启用"
+          inactive-text="停用"
           inline-prompt
           style={switchStyle.value}
+          onChange={() => onChange(scope as any)}
+          onClick={() => handleSwitchClick(scope as any)}
         />
       ),
       width: 100
     },
     {
-      label: "注册时间",
-      prop: "registerTime",
+      label: "创建人",
+      prop: "roles"
+    },
+    {
+      label: "创建时间",
+      prop: "mobile",
       width: 180
     },
     {
@@ -113,8 +126,71 @@ export function useRole() {
     }
   ];
 
+  function onChange({ row, index }) {
+    // row.status === 1 ? (row.status = 2) : (row.status = 1);
+  }
+  function handleSwitchClick({ row, index }) {
+    // if (!filterBtn("/admin/user/edit")) {
+    //   message("暂无权限", { type: "error" });
+    //   return;
+    // }
+
+    ElMessageBox.confirm(
+      `确认要<strong>${
+        row.status === 1 ? "停用" : "启用"
+      }</strong><strong style='color:var(--el-color-primary)'>${
+        row.name
+      }</strong>吗?`,
+      "系统提示",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+        dangerouslyUseHTMLString: true,
+        draggable: true
+      }
+    ).then(() => {
+      switchLoadMap.value[index] = Object.assign(
+        {},
+        switchLoadMap.value[index],
+        {
+          loading: true
+        }
+      );
+      const copyRow = Object.assign({}, row);
+
+      // getMemberList(copyRow).then(res => {
+      let res: any = {};
+      if (res.code == 0) {
+        switchLoadMap.value[index] = Object.assign(
+          {},
+          switchLoadMap.value[index],
+          {
+            loading: false
+          }
+        );
+        row.status = copyRow.status;
+        message(`已${row.status === 2 ? "停用" : "启用"}${row.name}`, {
+          type: "success"
+        });
+      } else if (res.code == -1) {
+        switchLoadMap.value[index] = Object.assign(
+          {},
+          switchLoadMap.value[index],
+          {
+            loading: false
+          }
+        );
+        message(res.msg, { type: "error" });
+      }
+      // });
+    });
+    // .catch(() => {
+    //   row.status === 1 ? (row.status = 2) : (row.status = 1);
+    // });
+  }
   function handleDelete(row) {
-    message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
+    message(`您删除了角色名称为${row.id}的这条数据`, { type: "success" });
     onSearch(pagination.currentPage);
   }
 
@@ -133,20 +209,111 @@ export function useRole() {
     selectList.value = val;
   }
 
-  async function onSearch(page = 1) {
+  const batchDel = () => {
+    if (selectList.value.length == 0) {
+      message("请选择要删除的数据", { type: "warning" });
+    } else {
+      ElMessageBox.confirm(
+        "选中数据id为" + selectList.value.join() + "，确认要删除这些数据吗？",
+        "删除提示",
+        {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(() => {
+          handleDelete({ id: selectList.value.join() } as any);
+        })
+        .catch(() => {});
+    }
+  };
+  function openDialog(title = "新增", row = { role: 1, bm: 1 }) {
+    addDialog({
+      /* 自定义表头 */
+      title: title + "角色",
+      /* 自定义内容 */
+      contentRenderer: () => h(editForm, { ref: formRef }),
+      draggable: true,
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      width: "70%",
+      props: {
+        formInline: {
+          higherDeptOptions: cloneDeep(dataList.value),
+          ...row
+        }
+      },
+      /* 自定义底部 */
+      footerButtons: [
+        {
+          label: "提交",
+          size: "large",
+          style: {
+            width: "192px"
+          },
+          type: "primary",
+          btnClick: ({ dialog: { options, index }, button }) => {
+            handleCB(options, index);
+          }
+        },
+        {
+          label: "重置",
+          size: "large",
+          type: "danger",
+          style: {
+            width: "112px",
+            background: "#fff",
+            color: "#F33D3D"
+          },
+          btnClick: ({ dialog: { options, index }, button }) => {
+            handleCB(options, index);
+          }
+        }
+      ]
+    });
+
+    function chores(options: DialogOptions, index: number) {
+      message(`${title}成功`, { type: "success" });
+      closeDialog(options, index);
+      onSearch(); // 刷新表格数据
+    }
+    function handleCB(options: DialogOptions, index: number) {
+      const FormRef = formRef.value.getRef();
+      const curData = options.props.formInline;
+      FormRef.validate(valid => {
+        if (valid) {
+          console.log("curData", curData);
+          // 表单规则校验通过
+          if (title === "新增") {
+            // 实际开发先调用新增接口，再进行下面操作
+            chores(options, index);
+          } else {
+            // 实际开发先调用编辑接口，再进行下面操作
+            chores(options, index);
+          }
+        }
+      });
+    }
+  }
+  async function onSearch(page = 1, flag?: boolean) {
     loading.value = true;
-    const { is_vip, smrz, type } = form;
-    const { data } = await getMemberList(
+    if (flag) {
+      isSearch.value = true;
+    }
+    const searchDataFn = () => {
+      return isSearch.value ? form : {};
+    };
+    console.log(searchDataFn());
+
+    const { data } = await getUserList(
       toRaw({
         limit: pagination.pageSize,
         page: page,
-        is_vip,
-        smrz,
-        type,
-        [selectValue.value]: form["keyword"]
+        ...searchDataFn()
       })
     );
-    dataList.value = data.data;
+    dataList.value = data.items;
     pagination.total = data.total || 0;
     pagination.currentPage = page;
 
@@ -155,6 +322,7 @@ export function useRole() {
 
   const resetForm = formEl => {
     if (!formEl) return;
+    isSearch.value = false;
     formEl.resetFields();
     onSearch();
   };
@@ -168,6 +336,7 @@ export function useRole() {
     loading,
     columns,
     dataList,
+    isSearch,
     pagination,
     drawer,
     // buttonClass,
@@ -178,6 +347,8 @@ export function useRole() {
     handleSizeChange,
     handleCurrentChange,
     handleSelectionChange,
-    exportCheckItem
+    exportCheckItem,
+    batchDel,
+    openDialog
   };
 }
