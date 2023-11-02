@@ -8,7 +8,7 @@
       <el-tab-pane label="销售线索" name="Lead">
         <el-form label-position="left">
           <div class="pr-5 grid grid-cols-2 w-full" style="column-gap: 51px">
-            <el-form-item required label-width="22.08%" class="w-full">
+            <el-form-item label-width="22.08%" class="w-full">
               <template #label>
                 <p style="height: 42px; line-height: 42px">项目名称：</p>
               </template>
@@ -19,6 +19,16 @@
                 <p style="height: 42px; line-height: 42px">项目类型：</p>
               </template>
               <SingleSelect
+                name="项目类型"
+                class="w-full"
+                @change="handleChanges"
+              />
+            </el-form-item>
+            <el-form-item label-width="22.08%" class="w-full">
+              <template #label>
+                <p style="height: 42px; line-height: 42px">客户名称：</p>
+              </template>
+              <SingleSelect
                 name="客户名称"
                 class="w-full noRotate"
                 filterable
@@ -27,9 +37,34 @@
             </el-form-item>
             <el-form-item label-width="22.08%" class="w-full">
               <template #label>
-                <p style="height: 42px; line-height: 42px">项目类型：</p>
+                <p style="height: 42px; line-height: 42px">
+                  项目预算(单位:元)：
+                </p>
               </template>
               <el-input class="" style="height: 42px"></el-input>
+            </el-form-item>
+            <el-form-item label-width="22.08%" class="w-full">
+              <template #label>
+                <p style="height: 42px; line-height: 42px">预计签约日期：</p>
+              </template>
+
+              <el-date-picker
+                style="height: 42px; width: 100%"
+                type="date"
+                placeholder="Pick a day"
+              />
+            </el-form-item>
+            <el-form-item label-width="22.08%" class="w-full">
+              <template #label>
+                <p style="height: 42px; line-height: 42px">
+                  客户经理(单位:元)：
+                </p>
+              </template>
+              <el-input
+                class=""
+                placeholder="默认填单人姓名"
+                style="height: 42px"
+              ></el-input>
             </el-form-item>
           </div>
         </el-form>
@@ -38,44 +73,17 @@
     </el-tabs>
   </div>
 </template>
-<script lang="ts">
-import { ref, reactive, defineExpose } from "vue";
-import { message } from "@/utils/message";
-import type { TabsPaneContext } from "element-plus";
-import SingleSelect from "@/components/SingleSelect/index.vue";
-export default {
-  components: {
-    SingleSelect // 注册选择器组件
-  },
-  setup() {
-    console.log(123123123123123123);
 
-    let activeName = ref("Lead");
-    const handleClick = (tab: TabsPaneContext, event: Event) => {
-      console.log(tab, event);
-    };
-    function handleChanges(event) {
-      console.log("bbbbb", event);
-    }
-
-    return {
-      activeName,
-      handleClick,
-      handleChanges
-    };
-  }
-};
-</script>
 <script setup lang="ts">
-const form = ref({
-  name: "小美"
-});
-function getRef() {
-  return form.value;
-}
-defineExpose({
-  getRef
-});
+import { useProjectEdit } from "./hook";
+const {
+  activeName,
+  handleClick,
+  handleChanges,
+  editForm,
+  getRef,
+  SingleSelect
+} = useProjectEdit();
 </script>
 
 <style lang="scss">

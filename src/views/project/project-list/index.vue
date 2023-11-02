@@ -224,7 +224,7 @@ onMounted(() => {
                   link
                   type="info"
                   :size="size"
-                  @click="openDialog('编辑项目', ProjectEdit)"
+                  @click="openDialog('编辑项目', ProjectEdit, {}, () => {})"
                 >
                   编辑
                 </el-button>
@@ -236,7 +236,14 @@ onMounted(() => {
                   link
                   type="info"
                   :size="size"
-                  @click="openDialog('查看详情', ProjectDetail)"
+                  @click="
+                    openDialog(
+                      '查看详情',
+                      ProjectDetail,
+                      { hideFooter: true },
+                      () => {}
+                    )
+                  "
                 >
                   查看
                 </el-button>

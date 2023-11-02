@@ -168,7 +168,7 @@ export function useProject() {
     pagination.currentPage = page;
     loading.value = false;
   }
-  //重置表单
+  //筛选的重置表单
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
@@ -180,10 +180,8 @@ export function useProject() {
     useExecl(columns, selectList.value);
   };
   // 打开弹窗,传入对应的组件
-  const openDialog = (str: string, VNode: any) => {
-    alAddDialog(str, VNode, {}, res => {
-      console.log(res);
-    });
+  const openDialog = (str: string, VNode: any, customOptions, cb) => {
+    alAddDialog(str, VNode, customOptions, cb);
   };
   function alAddDialog(
     str: string,
@@ -192,8 +190,7 @@ export function useProject() {
     cb: Function
   ) {
     addDialog({
-      // showClose: false,
-      width: "calc(100% - 320px - 180px)",
+      width: "calc(100% - 80px)",
       /* 自定义表头 */
       title: str,
       /* 自定义内容 */
