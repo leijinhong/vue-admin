@@ -5,7 +5,7 @@
       style="min-height: 42px"
       class="w-full"
       v-model="selectedValue"
-      :placeholder="'请选择' + name"
+      :placeholder="(name == '客户名称' ? '请输入/选择' : '请选择') + name"
       :multiple="multiple"
       :filterable="filterable"
       :suffix-icon="
@@ -41,7 +41,7 @@
 <script lang="ts">
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Delete from "@iconify-icons/ep/delete";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
 import {
   getProjectStage,
@@ -52,6 +52,10 @@ import {
 } from "@/api/public";
 export default {
   props: {
+    modelValue: {
+      type: String,
+      default: null
+    },
     name: String, // 从父组件传来的字段
     multiple: {
       type: Boolean,
@@ -68,10 +72,9 @@ export default {
       default: false
     } */
   },
-  emit: ["change"],
+  emit: ["update:modelValue", "change"],
   setup(props, { emit }) {
     // 选中的ID/值
-    const selectedValue = ref(null);
     // 下拉数据数组
     const options = ref([]);
     // 获取项目类型的下拉数据
@@ -124,6 +127,14 @@ export default {
         console.error("Error:", error);
       }
     }
+    const selectedValue = computed({
+      get() {
+        return props.modelValue;
+      },
+      set(val) {
+        emit("update:modelValue", val);
+      }
+    });
     const addCustomer = () => {
       console.log("开启添加客户弹窗");
     };

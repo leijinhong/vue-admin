@@ -278,6 +278,8 @@ export function useHook() {
 
   const resetForm = formEl => {
     if (!formEl) return;
+    console.log(formEl);
+
     formEl.resetFields();
     onSearch();
   };

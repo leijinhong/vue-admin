@@ -106,10 +106,7 @@ type ButtonProps = {
     [key in string]:string
   },
   /** 点击按钮后触发的回调 */
-  btnClick?: ({
-    dialog,
-    button
-  }: {
+  btnClick?: ({dialog,button}: {
     /** 当前 `Dialog` 信息 */
     dialog: BtnClickDialog;
     /** 当前 `button` 信息 */

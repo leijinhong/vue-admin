@@ -1,17 +1,8 @@
 <!-- 项目列表 -->
 
 <script setup lang="ts">
-import { ref, onMounted, createVNode } from "vue";
-import { useProject } from "./utils/hook";
-import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
-import Delete from "@iconify-icons/ep/delete";
-import Search from "@iconify-icons/ep/search";
-import Refresh from "@iconify-icons/ep/refresh";
-import AddFill from "@iconify-icons/ri/add-circle-line";
-import { PureTableBar } from "@/components/RePureTableBar";
-import ProjectDetail from "@/components/ProjectDetail/index.vue";
-import ProjectEdit from "@/components/ProjectEdit/index.vue";
+import { onMounted } from "vue";
+import { useProjectList } from "./utils/hook";
 defineOptions({
   name: "projectList"
 });
@@ -29,10 +20,18 @@ const {
   handleCurrentChange,
   handleSelectionChange,
   exportCheckItem,
-  batchDel,
   openDialog,
-  formRef
-} = useProject();
+  ProjectDetail,
+  ProjectEdit,
+  useRenderIcon,
+  CaretBottom,
+  Delete,
+  Search,
+  Refresh,
+  AddFill,
+  PureTableBar,
+  searchForm
+} = useProjectList();
 
 onMounted(() => {
   onSearch();
@@ -44,8 +43,13 @@ onMounted(() => {
     <div
       class="md:flex justify-between rounded-[10px] shadow-1 bg-bg_color p-5"
     >
-      <el-form ref="formRef" :inline="true" :model="form" class="search-form">
-        <el-form-item label="" class="mb-3 md:mt-0" prop="keyword">
+      <el-form
+        ref="searchForm"
+        :inline="true"
+        :model="form"
+        class="search-form"
+      >
+        <el-form-item label="" class="mb-3 md:mt-0" prop="project_name">
           <el-input
             v-model="form.project_name"
             placeholder="项目名称"
@@ -53,7 +57,7 @@ onMounted(() => {
             class="!w-[184px]"
           />
         </el-form-item>
-        <el-form-item label="" class="mb-3 md:mt-0" prop="is_vip">
+        <el-form-item label="" class="mb-3 md:mt-0" prop="encode">
           <el-input
             v-model="form.encode"
             placeholder="项目编号"
@@ -61,7 +65,7 @@ onMounted(() => {
             class="!w-[204px]"
           />
         </el-form-item>
-        <el-form-item label="" class="mb-3 md:mt-0" prop="type">
+        <el-form-item label="" class="mb-3 md:mt-0" prop="customer_id">
           <el-select
             v-model="form.customer_id"
             placeholder="客户名称"
@@ -95,7 +99,7 @@ onMounted(() => {
             height: var(--el-component-size) !important;
           "
           :icon="useRenderIcon(Refresh)"
-          @click="resetForm(formRef)"
+          @click="resetForm(searchForm)"
         >
           重置
         </el-button>
@@ -130,7 +134,6 @@ onMounted(() => {
               "
               type="danger"
               :icon="useRenderIcon(Delete)"
-              @click="batchDel"
             >
               删除
             </el-button>
