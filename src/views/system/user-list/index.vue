@@ -6,7 +6,6 @@ import { ref, onMounted } from "vue";
 import { useHook } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-
 import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
 
 // import Database from "@iconify-icons/ri/database-2-line";

@@ -57,7 +57,7 @@ export function useHook() {
     }
   );
 
-  // 会员列表表格内容
+  // 列表表格内容
   const columns: TableColumnList = [
     {
       type: "selection",
