@@ -66,12 +66,16 @@
         <!-- 项目预算 -->
         <el-form-item label-width="22.08%" class="w-full" prop="project_budget">
           <template #label>
+<<<<<<< Updated upstream
             <p
               style="height: 42px; line-height: 42px"
               class="whitespace-nowrap"
             >
               项目预算<span class="text-sm">(单位:元)：</span>
             </p>
+=======
+            <p style="height: 42px; line-height: 42px">项目预算(单位:元)：</p>
+>>>>>>> Stashed changes
           </template>
           <el-input
             placeholder="请输入预算"
@@ -201,6 +205,7 @@
           placeholder="请输入项目组成成员【应为多选的人员选择器】"
         />
       </el-form-item>
+<<<<<<< Updated upstream
       <!-- 产品列表表格 -->
       <div class="mb-5">
         <pure-table
@@ -245,6 +250,8 @@
           </el-button>
         </div>
       </div>
+=======
+>>>>>>> Stashed changes
       <!-- 通知人员 -->
       <el-form-item label-width="10.79%" class="w-full pr-5" prop="notice_man">
         <template #label>
@@ -261,10 +268,17 @@
         <template #label>
           <p style="height: 42px; line-height: 42px">上传附件：</p>
         </template>
+<<<<<<< Updated upstream
         <el-button class="mr-2.5" style="height: 42px" plain :icon="Upload">
           选择附件
         </el-button>
         *支持格式：.pdf .doc .docx .rar .zip .svg .sng .jpg 单个文件不超过20M
+=======
+        <!-- <el-button class="mr-2.5" style="height: 42px" plain :icon="Upload">
+          选择附件
+        </el-button>
+        *支持格式：.pdf .doc .docx .rar .zip .svg .sng .jpg 单个文件不超过20M -->
+>>>>>>> Stashed changes
       </el-form-item>
     </el-form>
   </div>
@@ -272,6 +286,7 @@
 
 <script setup lang="ts">
 import { useEditForm } from "./hook";
+<<<<<<< Updated upstream
 const {
   handleChanges,
   editForm,
@@ -283,6 +298,10 @@ const {
   AddFill,
   Delete
 } = useEditForm();
+=======
+const { handleChanges, editForm, SingleSelect, formRef, Upload } =
+  useEditForm();
+>>>>>>> Stashed changes
 defineExpose({ editForm, formRef });
 </script>
 
