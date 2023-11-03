@@ -65,7 +65,7 @@ defineExpose({ getRef });
           :label="newFormInline.title == '新增' ? '位置' : '原位置'"
           prop="nickname"
         >
-          <!-- <el-select
+          <el-select
             v-model="newFormInline.nickname"
             placeholder="文件位置"
             :disabled="newFormInline.title == '改名'"
@@ -79,7 +79,7 @@ defineExpose({ getRef });
               :label="item.label"
               :value="item.value"
             />
-          </el-select> -->
+          </el-select>
         </el-form-item>
       </re-col>
       <re-col>
