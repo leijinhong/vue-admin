@@ -201,6 +201,50 @@
           placeholder="请输入项目组成成员【应为多选的人员选择器】"
         />
       </el-form-item>
+      <!-- 产品列表表格 -->
+      <div class="mb-5">
+        <pure-table
+          align-whole="center"
+          :header-cell-style="{
+            color: 'var(--el-text-color-primary)'
+          }"
+          stripe
+          showOverflowTooltip
+          :data="editForm.product_list"
+          :columns="columns"
+        >
+          <template #unitPrice>含税单价<br />(单位：元)</template>
+          <template #finalPrice>含税成交价<br />(单位：元)</template>
+          <template #untaxedPrice>未税价<br />(单位：元)</template>
+          <template #operation="{ row }">
+            <span style="color: red">删除</span>
+          </template>
+        </pure-table>
+        <div class="flex gap-3 mt-5">
+          <el-button
+            style="
+              padding: 10px 20px 10px 10px;
+              --el-font-size-base: 16px;
+              height: var(--el-component-size);
+            "
+            type="primary"
+            :icon="useRenderIcon(AddFill)"
+          >
+            添加
+          </el-button>
+          <el-button
+            style="
+              padding: 10px 20px 10px 10px;
+              --el-font-size-base: 16px;
+              height: var(--el-component-size);
+            "
+            type="danger"
+            :icon="useRenderIcon(Delete)"
+          >
+            删除
+          </el-button>
+        </div>
+      </div>
       <!-- 通知人员 -->
       <el-form-item label-width="10.79%" class="w-full pr-5" prop="notice_man">
         <template #label>
@@ -217,10 +261,10 @@
         <template #label>
           <p style="height: 42px; line-height: 42px">上传附件：</p>
         </template>
-        <!-- <el-button class="mr-2.5" style="height: 42px" plain :icon="Upload">
+        <el-button class="mr-2.5" style="height: 42px" plain :icon="Upload">
           选择附件
         </el-button>
-        *支持格式：.pdf .doc .docx .rar .zip .svg .sng .jpg 单个文件不超过20M -->
+        *支持格式：.pdf .doc .docx .rar .zip .svg .sng .jpg 单个文件不超过20M
       </el-form-item>
     </el-form>
   </div>
@@ -228,8 +272,17 @@
 
 <script setup lang="ts">
 import { useEditForm } from "./hook";
-const { handleChanges, editForm, SingleSelect, formRef, Upload } =
-  useEditForm();
+const {
+  handleChanges,
+  editForm,
+  SingleSelect,
+  formRef,
+  Upload,
+  columns,
+  useRenderIcon,
+  AddFill,
+  Delete
+} = useEditForm();
 defineExpose({ editForm, formRef });
 </script>
 

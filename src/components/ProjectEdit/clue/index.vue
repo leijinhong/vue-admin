@@ -66,9 +66,13 @@
         />
       </el-form-item>
       <!-- 项目预算 -->
-      <el-form-item label-width="10.79%" class="w-full" prop="project_budget">
+      <el-form-item
+        label-width="10.79%"
+        class="w-full pr-5"
+        prop="project_budget"
+      >
         <template #label>
-          <p style="height: 42px; line-height: 42px">
+          <p style="height: 42px; line-height: 42px" class="whitespace-nowrap">
             项目预算<span class="text-sm">(单位:元)</span>：
           </p>
         </template>
@@ -80,7 +84,7 @@
         ></el-input>
       </el-form-item>
       <!-- 通知人员 -->
-      <el-form-item label-width="10.79%" class="w-full" prop="notice_man">
+      <el-form-item label-width="10.79%" class="w-full pr-5" prop="notice_man">
         <template #label>
           <p style="height: 42px; line-height: 42px">通知人员：</p>
         </template>
