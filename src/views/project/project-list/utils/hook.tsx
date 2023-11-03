@@ -158,6 +158,12 @@ export function useProjectList() {
   const exportCheckItem = () => {
     useExecl(columns, selectList.value);
   };
+  /* 进入弹窗的时候,告诉子组件, 该项目是什么阶段
+    销售线索:1
+    销售商机:2
+    销售立项:3
+  */
+  let step = 3;
   // 打开弹窗,传入对应的组件
   const openDialog = (
     str: string,
@@ -179,8 +185,7 @@ export function useProjectList() {
           },
           type: "primary",
           btnClick: ({ dialog: { options, index }, button }) => {
-            console.log(options, index, button);
-            submit(options, index);
+            btnCallBack(options, index, button);
           }
         },
 
@@ -194,8 +199,7 @@ export function useProjectList() {
             marginRight: "40px"
           },
           btnClick: ({ dialog: { options, index }, button }) => {
-            console.log(options, index, button);
-            closeDialog(options, index);
+            btnCallBack(options, index, button);
           }
         },
 
@@ -210,8 +214,7 @@ export function useProjectList() {
             marginLeft: "0px"
           },
           btnClick: ({ dialog: { options, index }, button }) => {
-            console.log(options, index, button);
-            closeDialog(options, index);
+            btnCallBack(options, index, button);
           }
         }
       ],
@@ -219,16 +222,100 @@ export function useProjectList() {
     });
   };
 
-  const submit = (options, index) => {
-    console.log(editDialog.value.clueCompoents.editForm);
-    closeDialog(options, index);
+  const btnCallBack = async (options, index, button) => {
+    console.log("options", options);
+    console.log("index", index);
+    console.log("button", button);
+    let projectDialog = editDialog.value;
+    let activeName = projectDialog.activeName;
+    let editForm = projectDialog[activeName].editForm;
+    let editFormRef = projectDialog[activeName].formRef;
+    let flagClose = false;
+    //根据step和activeName和button的label来执行对应的功能
+    var actionMap = [
+      [
+        () =>
+          [1, 2, 3].includes(step) &&
+          activeName === "clueComponent" &&
+          button.btn.label === "提交",
+        () => {
+          console.log("执行编辑项目中【销售线索】的提交方法");
+          return new Promise(resolve => {
+            setTimeout(() => {
+              flagClose = true;
+              resolve(null);
+            }, 2000);
+          });
+        }
+      ],
+      [
+        () =>
+          [1, 2, 3].includes(step) &&
+          activeName === "clueComponent" &&
+          button.btn.label === "保存后继续编辑",
+        () => console.log("执行编辑项目中【销售线索】的保存后继续编辑方法")
+      ],
+      [
+        () =>
+          [1, 2, 3].includes(step) &&
+          activeName === "followComponent" &&
+          button.btn.label === "提交",
+        () => {
+          console.log("执行编辑项目中【项目跟进】的提交方法");
+          return new Promise(resolve => {
+            setTimeout(() => {
+              flagClose = true;
+              resolve(null);
+            }, 2000);
+          });
+        }
+      ],
+      [
+        () =>
+          [1, 2, 3].includes(step) &&
+          activeName === "followComponent" &&
+          button.btn.label === "保存后继续编辑",
+        () => console.log("执行编辑项目中【项目跟进】的保存后继续编辑方法")
+      ],
+      [
+        () =>
+          [3].includes(step) &&
+          activeName === "establishComponent" &&
+          button.btn.label === "提交",
+        () => {
+          console.log("执行编辑项目中【项目立项】的提交方法");
+          return new Promise(resolve => {
+            setTimeout(() => {
+              flagClose = true;
+              resolve(null);
+            }, 2000);
+          });
+        }
+      ],
+      [
+        () =>
+          [3].includes(step) &&
+          activeName === "establishComponent" &&
+          button.btn.label === "保存后继续编辑",
+        () => console.log("执行编辑项目中【项目立项】的保存后继续编辑方法")
+      ]
+    ];
+
+    const targetAction = actionMap.find(action => action[0]());
+    if (targetAction) {
+      await targetAction[1]();
+    } else {
+      console.log("重置编辑项目中的当前表单");
+      editFormRef.resetFields();
+    }
+    console.log("activeName,", activeName);
+    console.log("editForm,", editForm);
+    if (flagClose) {
+      // console.log("执行关闭弹窗");
+      closeDialog(options, index);
+    }
   };
-  /* 进入弹窗的时候,告诉子组件, 该项目是什么阶段
-    销售线索:1
-    销售商机:2
-    销售立项:3
-  */
-  let step = 1;
+
   return {
     selectValue,
     searchForm,

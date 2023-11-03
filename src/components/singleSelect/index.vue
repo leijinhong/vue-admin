@@ -154,9 +154,9 @@ export default {
       }
     };
 
-    const handleChange = () => {
+    const handleChange = val => {
       // 触发自定义事件并传递选中的值给父组件
-      emit("change", selectedValue.value);
+      emit("change", val);
     };
 
     // 在组件加载时获取数据

@@ -2,6 +2,14 @@
   --el-form-label-font-size: 16px;
   --el-text-color-regular: #666666;
   font-weight: 400;
+  height: 42px !important;
+  line-height: 42px !important;
+}
+.el-textarea__inner{
+  font-size: 16px !important;
+  &::placeholder{
+    color: #999 !important;
+  }
 }
 .el-table__body tr.hover-row > td.el-table__cell {
   background-color: var(--el-table-row-hover-bg-color) !important;
@@ -142,7 +150,7 @@
     font-size: 16px;
     color: #333333 !important;
     &::placeholder {
-      // color: #666666 !important;
+      color: #999 !important;
     }
   }
 }

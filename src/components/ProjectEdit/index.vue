@@ -7,28 +7,46 @@
       @tab-click="changeTab"
     >
       <!-- 销售线索 -->
-      <el-tab-pane v-if="props.step == 1" label="销售线索" name="clueCompoent">
-        <clue ref="clueCompoent"></clue>
+      <el-tab-pane
+        v-if="[1, 2, 3].includes(props.step)"
+        label="销售线索"
+        name="clueComponent"
+      >
+        <clue ref="clueComponent"></clue>
+      </el-tab-pane>
+      <!-- 项目立项 -->
+      <el-tab-pane
+        v-if="[3].includes(props.step)"
+        label="项目立项"
+        name="establishComponent"
+      >
+        <establish ref="establishComponent"></establish>
       </el-tab-pane>
       <!-- 项目跟进 -->
       <el-tab-pane
-        v-if="props.step == 1"
+        v-if="[1, 2, 3].includes(props.step)"
         label="项目跟进"
-        name="followCompoent"
+        name="followComponent"
       >
-        <follow ref="followCompoent"></follow>
+        <follow ref="followComponent"></follow>
       </el-tab-pane>
     </el-tabs>
   </div>
 </template>
-
 <script setup lang="ts">
 import { useProjectEdit } from "./hook";
 import { ref } from "vue";
-const { activeName, changeTab, clue } = useProjectEdit();
-let clueCompoent = ref();
-let followCompoent = ref();
-defineExpose({ activeName, clueCompoent, followCompoent });
+const { activeName, changeTab, clue, follow, establish } = useProjectEdit();
+let clueComponent = ref();
+let followComponent = ref();
+let establishComponent = ref();
+
+defineExpose({
+  activeName,
+  clueComponent,
+  followComponent,
+  establishComponent
+});
 const props = defineProps({
   step: Number
 });

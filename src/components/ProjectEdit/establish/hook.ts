@@ -1,11 +1,7 @@
 import { ref, reactive } from "vue";
-import type { TabsPaneContext } from "element-plus";
 import SingleSelect from "@/components/SingleSelect/index.vue";
-export function useEditClue() {
-  let activeName = ref("clue");
-  const handleClick = (tab: TabsPaneContext, event: Event) => {
-    console.log(tab, event);
-  };
+import { Upload } from '@element-plus/icons-vue'
+export function useEditForm() {
   function handleChanges(event) {
     console.log("点击了下拉选项", event);
   }
@@ -19,7 +15,14 @@ export function useEditClue() {
     project_budget: '',//项目预算
     projectEstimatedSigningDate:'',//项目预计签约日期
     customer_manager:null,//客户经理
-    opportunity_desc:'',//商机描述
+    project_desc:'',//项目描述
+    operation_mode: null,//运作方式
+    project_manager:null,//项目经理
+    solution_manager:null,//解决方案经理
+    field_engineer:null,//现场工程师
+    project_team_members:null,//项目组成成员
+    notice_man:null,//通知人员
+    //添加的产品
     product_list:[
       // {
       //   id:0,
@@ -32,19 +35,16 @@ export function useEditClue() {
       //   priceBeforeTax:'',
       //   notes:''
       // }
-    ]
-    
-  });
-  function getRef() {
-    return editForm;
-  }
+    ],
+    upload_list:[]//上传的附件
 
+  });
+  let formRef= ref();
   return {
-    activeName,
-    handleClick,
     handleChanges,
     editForm,
-    getRef,
-    SingleSelect
+    SingleSelect,
+    formRef,
+    Upload
   };
 }
