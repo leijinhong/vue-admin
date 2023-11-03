@@ -53,10 +53,10 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         .loginByUsername(ruleForm)
         .then(res => {
           if (res.code == 0) {
+            message("登录成功 正在前往首页", { type: "success" });
             // 获取后端路由
             initRouter().then(() => {
               router.push(getTopMenu(true).path);
-              message("登录成功", { type: "success" });
             });
           }
         });
