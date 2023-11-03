@@ -3,9 +3,15 @@ import { ref } from "vue";
 import ReCol from "@/components/ReCol";
 import { formRules } from "./utils/rule";
 import { usePublicHooks } from "../hooks";
-import AlRoleSelect from "@/components/AlRoleSelect";
-import AlOrganizationSelect from "@/components/AlOrganizationSelect";
+import { useUserStoreHook } from "@/store/modules/userStore";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
+import { computed } from "vue";
+import { onMounted } from "vue";
 
+const { list } = useUserStoreHook();
+
+const userList = ref([]);
 interface FormType {
   nickname: string;
   code: string;
@@ -40,6 +46,9 @@ function getRef() {
   return ruleFormRef.value;
 }
 
+onMounted(async () => {
+  userList.value = await list;
+});
 defineExpose({ getRef });
 </script>
 
@@ -97,11 +106,20 @@ defineExpose({ getRef });
 
       <re-col>
         <el-form-item label="创建人">
-          <el-input
+          <el-select
             v-model="newFormInline.nickname"
+            placeholder="请选择创建人（默认账号提交人）"
             clearable
-            placeholder="请输入备注"
-          />
+            filterable
+            :suffix-icon="useRenderIcon(CaretBottom)"
+          >
+            <el-option
+              v-for="item in userList"
+              :key="item.id"
+              :label="item.username"
+              :value="item.id"
+            />
+          </el-select>
         </el-form-item>
       </re-col>
     </el-row>

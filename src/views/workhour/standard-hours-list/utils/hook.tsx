@@ -1,28 +1,20 @@
 import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { message } from "@/utils/message";
-import { getUserList } from "@/api/user";
+// import { getUserList } from "@/api/user";
 import { usePublicHooks } from "../../hooks";
 import { DialogOptions, addDialog, closeDialog } from "@/components/ReDialog";
 import { type PaginationProps } from "@pureadmin/table";
-import {
-  reactive,
-  ref,
-  onMounted,
-  h,
-  toRaw,
-  computed,
-  watch,
-  watchEffect
-} from "vue";
+import { useUserStoreHook } from "@/store/modules/userStore";
+import { reactive, ref, h, toRaw, watch } from "vue";
 import { cloneDeep, priceToThousands } from "@pureadmin/utils";
 import { ElMessageBox } from "element-plus";
 import useExecl from "@/hooks/useExecl";
 import { useAppStoreHook } from "@/store/modules/app";
-const { VITE_CONFIG_URL } = import.meta.env;
+import { getHoursList } from "@/api/workingHours";
 
 export function useHook() {
-  const selectValue = ref("name");
+  const { getList } = useUserStoreHook();
 
   /**
    * @description 搜索表单数据
@@ -35,12 +27,14 @@ export function useHook() {
   /** 控制详情抽屉 */
   const drawer = ref(false);
   const formRef = ref();
-  const dataList = ref<UserItemType[]>();
+  const dataList = ref<HoursItemType[]>();
   const loading = ref(true);
   const switchLoadMap = ref({});
   const { switchStyle } = usePublicHooks();
   const selectList = ref([]);
   const isSearch = ref(false);
+  const selectValue = ref("name");
+  const userList = ref<UserItemType[]>([]);
 
   // 分页器配置
   const pagination = reactive<PaginationProps>({
@@ -64,7 +58,7 @@ export function useHook() {
     }
   );
 
-  // 会员列表表格内容
+  // 表格内容
   const columns: TableColumnList = [
     {
       type: "selection",
@@ -73,20 +67,20 @@ export function useHook() {
     },
     {
       label: "事件编号",
-      prop: "number",
+      prop: "code",
       width: 120
     },
     {
       label: "事件名称",
-      prop: "username"
+      prop: "event_name"
     },
     {
       label: "标准工时（H）",
-      prop: "nickname"
+      prop: "hours"
     },
     {
       label: "备注",
-      prop: "post"
+      prop: "notes"
     },
 
     {
@@ -111,11 +105,11 @@ export function useHook() {
     },
     {
       label: "创建人",
-      prop: "roles"
+      prop: "nickname"
     },
     {
       label: "创建时间",
-      prop: "mobile",
+      prop: "create_time",
       width: 180
     },
     {
@@ -189,9 +183,13 @@ export function useHook() {
     //   row.status === 1 ? (row.status = 2) : (row.status = 1);
     // });
   }
-  function handleDelete(row) {
-    message(`您删除了角色名称为${row.id}的这条数据`, { type: "success" });
-    onSearch(pagination.currentPage);
+  function handleDelete(row: HoursItemType) {
+    getHoursList({ id: row.id }).then(res => {
+      // if (res == 0) {
+      message(`您删除了事件编号为${row.code}的这条数据`, { type: "success" });
+      onSearch(pagination.currentPage);
+      // }
+    });
   }
 
   function handleSizeChange(val: number) {
@@ -206,7 +204,7 @@ export function useHook() {
   }
 
   function handleSelectionChange(val) {
-    selectList.value = val;
+    selectList.value = val.map(i => i.id);
   }
 
   const batchDel = () => {
@@ -286,11 +284,17 @@ export function useHook() {
           console.log("curData", curData);
           // 表单规则校验通过
           if (title === "新增") {
-            // 实际开发先调用新增接口，再进行下面操作
-            chores(options, index);
+            getHoursList(curData).then(res => {
+              // if (res == 0) {
+              chores(options, index);
+              // }
+            });
           } else {
-            // 实际开发先调用编辑接口，再进行下面操作
-            chores(options, index);
+            getHoursList(curData).then(res => {
+              // if (res == 0) {
+              chores(options, index);
+              // }
+            });
           }
         }
       });
@@ -306,7 +310,7 @@ export function useHook() {
     };
     console.log(searchDataFn());
 
-    const { data } = await getUserList(
+    const { data } = await getHoursList(
       toRaw({
         limit: pagination.pageSize,
         page: page,
@@ -320,6 +324,12 @@ export function useHook() {
     loading.value = false;
   }
 
+  async function getUserList() {
+    const { data } = await getList({
+      limit: 1000
+    });
+    userList.value = data.items;
+  }
   const resetForm = formEl => {
     if (!formEl) return;
     isSearch.value = false;
@@ -339,7 +349,9 @@ export function useHook() {
     isSearch,
     pagination,
     drawer,
+    userList,
     // buttonClass,
+    getUserList,
     onSearch,
     resetForm,
     handleDelete,

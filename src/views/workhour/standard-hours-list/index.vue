@@ -6,7 +6,6 @@ import { ref, onMounted } from "vue";
 import { useHook } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-import AlRoleSelect from "@/components/AlRoleSelect";
 
 import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
 
@@ -24,27 +23,26 @@ defineOptions({
 
 const formRef = ref();
 const {
-  selectValue,
   form,
   loading,
   columns,
   dataList,
   pagination,
-  drawer,
-  isSearch,
-  // buttonClass,
+  userList,
   onSearch,
   resetForm,
-  // handleDatabase,
   handleSizeChange,
   handleCurrentChange,
   handleSelectionChange,
   exportCheckItem,
   batchDel,
+  handleDelete,
+  getUserList,
   openDialog
 } = useHook();
 
 onMounted(() => {
+  getUserList();
   onSearch();
 });
 </script>
@@ -69,12 +67,21 @@ onMounted(() => {
           />
         </el-form-item>
         <el-form-item label="" class="!mb-0 md:mt-0" prop="nickname">
-          <el-input
+          <el-select
             v-model="form.nickname"
+            class="!w-[204px]"
             placeholder="请选择提交人"
             clearable
-            class="!w-[204px]"
-          />
+            filterable
+            :suffix-icon="useRenderIcon(CaretBottom)"
+          >
+            <el-option
+              v-for="item in userList"
+              :key="item.id"
+              :label="item.username"
+              :value="item.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="" class="!mb-0 md:mt-0" prop="time">
           <el-date-picker
@@ -199,15 +206,33 @@ onMounted(() => {
           <template #operation="{ row }">
             <div class="flex gap-3">
               <Auth value="/admin/user/edit">
-                <el-button class="reset-margin" link type="info" :size="size">
+                <el-button
+                  class="reset-margin"
+                  link
+                  type="info"
+                  :size="size"
+                  @click="openDialog('编辑', row)"
+                >
                   编辑
                 </el-button>
               </Auth>
 
               <Auth value="/admin/user/del">
-                <el-button class="reset-margin" link type="danger" :size="size">
-                  删除
-                </el-button>
+                <el-popconfirm
+                  :title="`是否确认删除事件编号为${row.code}的这条数据`"
+                  @confirm="handleDelete(row)"
+                >
+                  <template #reference>
+                    <el-button
+                      class="reset-margin"
+                      link
+                      type="danger"
+                      :size="size"
+                    >
+                      删除
+                    </el-button>
+                  </template>
+                </el-popconfirm>
               </Auth>
             </div>
           </template>

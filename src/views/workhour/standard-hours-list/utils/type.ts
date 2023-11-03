@@ -1,27 +1,10 @@
-interface UserItemType {
+interface HoursItemType {
   id: number;
-  username: string;
-  number: string;
+  code: string;
+  event_name: string;
+  hours: string;
+  notes: string;
+  status: 1 | 2;
   nickname: string;
-  post: string;
-  password: string;
-  sex?: any;
-  identity_card?: string;
-  birth?: string;
-  avatar: string;
-  email?: string;
-  mobile: string;
-  bank_name: string;
-  bank_account: string;
-  bank_username?: string;
-  login_at?: string;
-  post_status: number;
-  status: number;
-  org_id: number;
-  entry_time?: string;
-  depart_time?: any;
-  created_at?: string;
-  updated_at: string;
-  roles: string;
-  show_toolbar: boolean;
+  create_time: string;
 }
