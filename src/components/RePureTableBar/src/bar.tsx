@@ -397,7 +397,7 @@ export default defineComponent({
             /> */}
           </div>
 
-          <div class="mt-5"></div>
+          {props.isDrag && <div class="mt-5"></div>}
           {/* <el-divider class="mt-5" /> */}
 
           {slots.default({
