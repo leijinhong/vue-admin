@@ -1,108 +1,88 @@
-import dayjs from "dayjs";
-import editForm from "../form.vue";
+import editForm from "../../components/form.vue";
 import { message } from "@/utils/message";
-import { getMemberList } from "@/api/member";
-import { usePublicHooks } from "../../hooks";
-import { addDialog } from "@/components/ReDialog";
+import { DialogOptions, addDialog, closeDialog } from "@/components/ReDialog";
 import { type PaginationProps } from "@pureadmin/table";
-import { reactive, ref, onMounted, h, toRaw, computed, watch } from "vue";
-import { priceToThousands } from "@pureadmin/utils";
+import { reactive, ref, h, toRaw, watch } from "vue";
+import { cloneDeep } from "@pureadmin/utils";
 import { ElMessageBox } from "element-plus";
-import useExecl from "@/hooks/useExecl";
-const { VITE_CONFIG_URL } = import.meta.env;
+import { useAppStoreHook } from "@/store/modules/app";
+import { getFileMyList, getFilePublicList } from "@/api/document";
 
-export function useRole() {
-  const selectValue = ref("name");
-
+export function useHook() {
   /**
    * @description 搜索表单数据
-   * @param is_vip              是否vip会员
-   * @param type                会员类型
-   * @param smrz                是否实名认证
-   * @param phone               手机 phone/会员编号code/名称name 搜索
-   * @param code
-   * @param name
    */
   const form = reactive({
-    is_vip: null,
-    type: null,
-    smrz: null,
-    keyword: ""
+    name: "",
+    format: null
   });
   /** 控制详情抽屉 */
   const drawer = ref(false);
   const formRef = ref();
-  const dataList = ref([]);
+  const dataList = ref<FileType[]>();
   const loading = ref(true);
-  const switchLoadMap = ref({});
-  const { switchStyle } = usePublicHooks();
   const selectList = ref([]);
+  const isSearch = ref(false);
+  const selectValue = ref("name");
+  const formatList = ["pdf", "doc", "docx", "rar", "zip"].map(
+    (label, value) => ({
+      label,
+      value
+    })
+  );
+
   // 分页器配置
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
     background: true,
+    layout: "",
     pageSizes: [10, 20, 50, 100, 200]
   });
+  watch(
+    () => useAppStoreHook().device,
+    n => {
+      pagination.layout =
+        n == "mobile"
+          ? "prev,pager,next"
+          : "total, sizes, prev, pager, next, jumper";
+    },
+    {
+      immediate: true
+    }
+  );
 
-  // 会员列表表格内容
+  // 表格内容
   const columns: TableColumnList = [
     {
       type: "selection",
       align: "left"
-      // width: 50
     },
     {
-      label: "会员编号",
-      prop: "id",
+      label: "项目名称",
+      prop: "name",
       width: 120
     },
     {
-      label: "昵称",
-      prop: "name",
-      cellRenderer: scope => <div>{scope.row.name || scope.row.nickname}</div>
+      label: "文件格式",
+      prop: "format"
     },
     {
-      label: "手机号码",
-      prop: "phone",
-      width: 150
+      label: "文件大小",
+      prop: "size"
     },
     {
-      label: "所在地区",
-      prop: "resumeInfo.site"
+      label: "创建时间",
+      prop: "create_time"
     },
     {
-      label: "会员类型",
-      prop: "type",
-      cellRenderer: scope => <div>{scope.row.type}</div>
+      label: "修改时间",
+      prop: "update_time"
     },
     {
-      label: "VIP会员",
-      prop: "is_vip",
-      cellRenderer: scope => <div>{scope.row.is_vip == 1 ? "是" : "否"}</div>
-    },
-    {
-      label: "会员状态",
-      prop: "status",
-      cellRenderer: scope => (
-        <el-switch
-          size={scope.props.size}
-          loading={switchLoadMap.value[scope.index]?.loading}
-          model-value={scope.row.status}
-          active-value={1}
-          inactive-value={2}
-          active-text="已启用"
-          inactive-text="已停用"
-          inline-prompt
-          style={switchStyle.value}
-        />
-      ),
-      width: 100
-    },
-    {
-      label: "注册时间",
-      prop: "registerTime",
+      label: "创建人",
+      prop: "nickname",
       width: 180
     },
     {
@@ -113,9 +93,13 @@ export function useRole() {
     }
   ];
 
-  function handleDelete(row) {
-    message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
-    onSearch(pagination.currentPage);
+  function handleDelete(row: FileType) {
+    getFileMyList({ id: row.id }).then(res => {
+      // if (res == 0) {
+      message(`您删除了文件名为${row.name}的这条数据`, { type: "success" });
+      onSearch(pagination.currentPage);
+      // }
+    });
   }
 
   function handleSizeChange(val: number) {
@@ -125,28 +109,118 @@ export function useRole() {
   }
 
   function handleCurrentChange(val: number) {
-    // console.log(`current page: ${val}`);
     onSearch(val);
   }
 
   function handleSelectionChange(val) {
-    selectList.value = val;
+    selectList.value = val.map(i => i.id);
   }
 
-  async function onSearch(page = 1) {
+  const batchDel = () => {
+    if (selectList.value.length == 0) {
+      message("请选择要删除的数据", { type: "warning" });
+    } else {
+      ElMessageBox.confirm("确定要删除选择的数据吗？", "删除提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          handleDelete({ id: selectList.value.join() } as any);
+        })
+        .catch(() => {});
+    }
+  };
+  function openDialog(title = "新增", row = { role: 1, bm: 1 }) {
+    addDialog({
+      /* 自定义表头 */
+      title: title != "改名" ? title + "文件" : title,
+      /* 自定义内容 */
+      contentRenderer: () => h(editForm, { ref: formRef }),
+      draggable: true,
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      width: "50%",
+      props: {
+        formInline: {
+          title,
+          higherDeptOptions: cloneDeep(dataList.value),
+          ...row
+        }
+      },
+      /* 自定义底部 */
+      footerButtons: [
+        {
+          label: "取消",
+          size: "large",
+          style: {
+            width: "152px"
+          },
+          btnClick: ({ dialog: { options, index }, button }) => {
+            handleCB(options, index);
+          }
+        },
+        {
+          label: "确认",
+          size: "large",
+          style: {
+            width: "152px"
+          },
+          type: "primary",
+          btnClick: ({ dialog: { options, index }, button }) => {
+            handleCB(options, index);
+          }
+        }
+      ]
+    });
+
+    function chores(options: DialogOptions, index: number) {
+      message(`${title}成功`, { type: "success" });
+      closeDialog(options, index);
+      onSearch(); // 刷新表格数据
+    }
+    function handleCB(options: DialogOptions, index: number) {
+      const FormRef = formRef.value.getRef();
+      const curData = options.props.formInline;
+      FormRef.validate(valid => {
+        if (valid) {
+          console.log("curData", curData);
+          // 表单规则校验通过
+          if (title === "新增") {
+            getFileMyList(curData).then(res => {
+              // if (res == 0) {
+              chores(options, index);
+              // }
+            });
+          } else {
+            getFileMyList(curData).then(res => {
+              // if (res == 0) {
+              chores(options, index);
+              // }
+            });
+          }
+        }
+      });
+    }
+  }
+  async function onSearch(page = 1, flag?: boolean) {
     loading.value = true;
-    const { is_vip, smrz, type } = form;
-    const { data } = await getMemberList(
+    if (flag) {
+      isSearch.value = true;
+    }
+    const searchDataFn = () => {
+      return isSearch.value ? form : {};
+    };
+    console.log(searchDataFn());
+
+    const { data } = await getFileMyList(
       toRaw({
         limit: pagination.pageSize,
         page: page,
-        is_vip,
-        smrz,
-        type,
-        [selectValue.value]: form["keyword"]
+        ...searchDataFn()
       })
     );
-    dataList.value = data.data;
+    dataList.value = data.items;
     pagination.total = data.total || 0;
     pagination.currentPage = page;
 
@@ -155,29 +229,28 @@ export function useRole() {
 
   const resetForm = formEl => {
     if (!formEl) return;
+    isSearch.value = false;
     formEl.resetFields();
     onSearch();
   };
 
-  const exportCheckItem = () => {
-    useExecl(columns, selectList.value);
-  };
   return {
     selectValue,
     form,
     loading,
     columns,
     dataList,
+    isSearch,
     pagination,
     drawer,
-    // buttonClass,
+    formatList,
     onSearch,
     resetForm,
     handleDelete,
-    // handleDatabase,
     handleSizeChange,
     handleCurrentChange,
     handleSelectionChange,
-    exportCheckItem
+    batchDel,
+    openDialog
   };
 }

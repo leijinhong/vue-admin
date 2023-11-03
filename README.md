@@ -10,6 +10,10 @@
 
 项目的源代码目录，包含项目的主要代码文件。
 
+- `/components`:
+  - `AlOrganizationSelect`:组织选择器
+  - `AlRoleSelect`: 角色选择器
+  - `AlUserSelect`:人员选择器
 - `/hooks`: 存放便捷钩子，只需根据注释调用就行，例如:
   - `useExecl`: 管理导出功能
 

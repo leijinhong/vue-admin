@@ -1,3 +1,8 @@
+.el-form-item__label {
+  --el-form-label-font-size: 16px;
+  --el-text-color-regular: #666666;
+  font-weight: 400;
+}
 .el-table__body tr.hover-row > td.el-table__cell {
   background-color: var(--el-table-row-hover-bg-color) !important;
 }
@@ -135,13 +140,12 @@
   padding: 1px 20px !important;
   .el-input__inner {
     font-size: 16px;
-    color:#333333 !important;
+    color: #333333 !important;
     &::placeholder {
-      color: #666666 !important;
+      // color: #666666 !important;
     }
   }
 }
-
 
 .el-breadcrumb__inner,
 .el-breadcrumb__inner a {

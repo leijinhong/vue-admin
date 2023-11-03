@@ -16,7 +16,7 @@ export const useUserStore = defineStore({
     async list(state): Promise<UserItemType[]> {
       const route = useRoute();
       if (state.dataList.length == 0 && route.name != "userList") {
-        const res = await this.getList();
+        const res = await this.getList({ limit: 1000 });
         return res.data.items;
       } else {
         return state.dataList;

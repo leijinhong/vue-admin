@@ -6,8 +6,8 @@ import { ref, onMounted } from "vue";
 import { useHook } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-
 import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
+import AlUserSelect from "@/components/AlUserSelect/index";
 
 // import Database from "@iconify-icons/ri/database-2-line";
 // import More from "@iconify-icons/ep/more-filled";
@@ -28,7 +28,6 @@ const {
   columns,
   dataList,
   pagination,
-  userList,
   onSearch,
   resetForm,
   handleSizeChange,
@@ -37,12 +36,10 @@ const {
   exportCheckItem,
   batchDel,
   handleDelete,
-  getUserList,
   openDialog
 } = useHook();
 
 onMounted(() => {
-  getUserList();
   onSearch();
 });
 </script>
@@ -66,22 +63,12 @@ onMounted(() => {
             class="!w-[184px]"
           />
         </el-form-item>
-        <el-form-item label="" class="!mb-0 md:mt-0" prop="nickname">
-          <el-select
-            v-model="form.nickname"
-            class="!w-[204px]"
+        <el-form-item label="" class="!mb-0 md:mt-0" prop="userid">
+          <al-user-select
+            v-model="form.userid"
             placeholder="请选择提交人"
-            clearable
-            filterable
-            :suffix-icon="useRenderIcon(CaretBottom)"
-          >
-            <el-option
-              v-for="item in userList"
-              :key="item.id"
-              :label="item.username"
-              :value="item.id"
-            />
-          </el-select>
+            class="!w-[204px]"
+          ></al-user-select>
         </el-form-item>
         <el-form-item label="" class="!mb-0 md:mt-0" prop="time">
           <el-date-picker

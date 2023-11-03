@@ -14,14 +14,12 @@ import { useAppStoreHook } from "@/store/modules/app";
 import { getHoursList } from "@/api/workingHours";
 
 export function useHook() {
-  const { getList } = useUserStoreHook();
-
   /**
    * @description 搜索表单数据
    */
   const form = reactive({
     nickname: "",
-    role: -1,
+    userid: -1,
     time: 0
   });
   /** 控制详情抽屉 */
@@ -34,7 +32,6 @@ export function useHook() {
   const selectList = ref([]);
   const isSearch = ref(false);
   const selectValue = ref("name");
-  const userList = ref<UserItemType[]>([]);
 
   // 分页器配置
   const pagination = reactive<PaginationProps>({
@@ -324,12 +321,6 @@ export function useHook() {
     loading.value = false;
   }
 
-  async function getUserList() {
-    const { data } = await getList({
-      limit: 1000
-    });
-    userList.value = data.items;
-  }
   const resetForm = formEl => {
     if (!formEl) return;
     isSearch.value = false;
@@ -349,13 +340,9 @@ export function useHook() {
     isSearch,
     pagination,
     drawer,
-    userList,
-    // buttonClass,
-    getUserList,
     onSearch,
     resetForm,
     handleDelete,
-    // handleDatabase,
     handleSizeChange,
     handleCurrentChange,
     handleSelectionChange,
