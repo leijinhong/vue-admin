@@ -31,6 +31,7 @@ defineExpose({ getRef, newFormInline });
     :model="newFormInline"
     :rules="formRules"
     label-width="82px"
+    class="mt-4"
   >
     <el-form-item label="上一级组织" prop="pid">
       <el-tree-select

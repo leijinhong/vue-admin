@@ -6,8 +6,6 @@ export default [
     url: "/admin/organization/select",
     method: "get",
     response: r => {
-      console.log(r);
-
       return {
         code: 0,
         data: {

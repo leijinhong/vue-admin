@@ -22,7 +22,7 @@ defineOptions({
 </script>
 <template>
   <div class="main p-5 bg-white" v-loading="loading">
-    <div class="flex justify-between px-3 pb-3">
+    <div class="flex px-3 pb-3">
       <Auth value="/admin/user/add">
         <el-button
           type="primary"

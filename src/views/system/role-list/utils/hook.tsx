@@ -11,7 +11,7 @@ import { RoleType } from "./type";
 import { cloneDeep } from "@pureadmin/utils";
 
 export function useRole() {
-  const { list, treeList, setList } = useRoleStoreHook();
+  const { getList, add, edit, del } = useRoleStoreHook();
   /**
    * @description 搜索表单数据
    */
@@ -156,12 +156,16 @@ export function useRole() {
     // });
   }
   function handleDelete(row: RoleType) {
-    message(`您删除了角色名称为${row.id}的这条数据`, { type: "success" });
-    onSearch();
+    del(row.id).then(res => {
+      if (res == 0) {
+        message(`您删除了角色名称为${row.id}的这条数据`, { type: "success" });
+        onSearch(form);
+      }
+    });
   }
 
   function handleSelectionChange(val) {
-    selectList.value = val;
+    selectList.value = val.map(i => i.id);
   }
 
   const batchDel = () => {
@@ -186,7 +190,7 @@ export function useRole() {
 
   async function onSearch(formData = { name: "" }) {
     loading.value = true;
-    const { data } = await getRoleList(
+    const { data } = await getList(
       toRaw({
         limit: pagination.pageSize,
         page: 1,
@@ -194,7 +198,6 @@ export function useRole() {
       })
     );
     dataList.value = handleTree(data.items, "id", "pid");
-    setList(data.items);
     pagination.total = data.total || 0;
 
     loading.value = false;
@@ -247,7 +250,7 @@ export function useRole() {
     function chores(options: DialogOptions, index: number) {
       message(`${title}成功`, { type: "success" });
       closeDialog(options, index);
-      onSearch(); // 刷新表格数据
+      onSearch(form); // 刷新表格数据
     }
     function handleCB(options: DialogOptions, index: number) {
       const FormRef = formRef.value.getRef();
@@ -257,11 +260,17 @@ export function useRole() {
           console.log("curData", curData);
           // 表单规则校验通过
           if (title === "新增") {
-            // 实际开发先调用新增接口，再进行下面操作
-            chores(options, index);
+            add(curData).then(res => {
+              if (res == 0) {
+                chores(options, index);
+              }
+            });
           } else {
-            // 实际开发先调用编辑接口，再进行下面操作
-            chores(options, index);
+            edit(curData).then(res => {
+              if (res == 0) {
+                chores(options, index);
+              }
+            });
           }
         }
       });

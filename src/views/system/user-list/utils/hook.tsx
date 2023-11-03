@@ -5,24 +5,17 @@ import { getUserList } from "@/api/user";
 import { usePublicHooks } from "../../hooks";
 import { DialogOptions, addDialog, closeDialog } from "@/components/ReDialog";
 import { type PaginationProps } from "@pureadmin/table";
-import {
-  reactive,
-  ref,
-  onMounted,
-  h,
-  toRaw,
-  computed,
-  watch,
-  watchEffect
-} from "vue";
+import { reactive, ref, h, toRaw, watch } from "vue";
 import { cloneDeep, priceToThousands } from "@pureadmin/utils";
 import { ElMessageBox } from "element-plus";
 import useExecl from "@/hooks/useExecl";
 import { useAppStoreHook } from "@/store/modules/app";
+import { useUserStoreHook } from "@/store/modules/userStore";
 const { VITE_CONFIG_URL } = import.meta.env;
 
 export function useHook() {
   const selectValue = ref("name");
+  const { getList, setList, add, edit, del } = useUserStoreHook();
 
   /**
    * @description 搜索表单数据
@@ -194,8 +187,12 @@ export function useHook() {
     // });
   }
   function handleDelete(row) {
-    message(`您删除了角色名称为${row.id}的这条数据`, { type: "success" });
-    onSearch(pagination.currentPage);
+    del(row.id).then(res => {
+      if (res == 0) {
+        message(`您删除了角色名称为${row.id}的这条数据`, { type: "success" });
+        onSearch(pagination.currentPage);
+      }
+    });
   }
 
   function handleSizeChange(val: number) {
@@ -210,7 +207,7 @@ export function useHook() {
   }
 
   function handleSelectionChange(val) {
-    selectList.value = val;
+    selectList.value = val.map(i => i.id);
   }
 
   const batchDel = () => {
@@ -290,11 +287,17 @@ export function useHook() {
           console.log("curData", curData);
           // 表单规则校验通过
           if (title === "新增") {
-            // 实际开发先调用新增接口，再进行下面操作
-            chores(options, index);
+            add(curData).then(res => {
+              if (res == 0) {
+                chores(options, index);
+              }
+            });
           } else {
-            // 实际开发先调用编辑接口，再进行下面操作
-            chores(options, index);
+            edit(curData).then(res => {
+              if (res == 0) {
+                chores(options, index);
+              }
+            });
           }
         }
       });
@@ -308,9 +311,8 @@ export function useHook() {
     const searchDataFn = () => {
       return isSearch.value ? form : {};
     };
-    console.log(searchDataFn());
 
-    const { data } = await getUserList(
+    const { data } = await getList(
       toRaw({
         limit: pagination.pageSize,
         page: page,

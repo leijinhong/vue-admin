@@ -71,22 +71,16 @@ onMounted(() => {
         <el-form-item label="" class="!mb-0 md:mt-0" prop="nickname">
           <el-input
             v-model="form.nickname"
-            placeholder="请输入姓名"
+            placeholder="请选择提交人"
             clearable
             class="!w-[204px]"
           />
         </el-form-item>
-        <el-form-item label="" class="!mb-0 md:mt-0" prop="email">
-          <!-- <al-role-select
-            class="!w-[204px]"
-            v-model="form.role"
-          ></al-role-select> -->
-        </el-form-item>
-        <el-form-item label="" class="!mb-0 md:mt-0" prop="email">
+        <el-form-item label="" class="!mb-0 md:mt-0" prop="time">
           <el-date-picker
             v-model="form.time"
             type="daterange"
-            range-separator="To"
+            range-separator="到"
             start-placeholder="开始时间"
             end-placeholder="结束时间"
           />

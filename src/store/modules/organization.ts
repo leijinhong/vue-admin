@@ -10,29 +10,9 @@ import {
   editOrganization,
   getOrganization
 } from "@/api/organization";
+import { handleTree } from "@/utils/tree";
+import { useRoute } from "vue-router";
 
-function buildTree(data) {
-  const map = new Map();
-  const tree = [];
-
-  // Create a map of nodes using their IDs as keys
-  data.forEach(node => {
-    map.set(node.id, { ...node, children: [] });
-  });
-
-  // Build the tree structure
-  data.forEach(node => {
-    const parentNode = map.get(node.pid);
-
-    if (parentNode) {
-      parentNode.children.push(map.get(node.id));
-    } else {
-      tree.push(map.get(node.id));
-    }
-  });
-
-  return tree;
-}
 export const useOrganizationStore = defineStore({
   id: "pure-organization",
   state: () => ({
@@ -40,41 +20,41 @@ export const useOrganizationStore = defineStore({
   }),
   getters: {
     async list(state): Promise<OrganizationItemType[]> {
-      if (state.dataList.length == 0) {
+      const route = useRoute();
+      if (state.dataList.length == 0 && route.name != "organizationList") {
         const res = await this.getList();
-        return res;
+        return res.data.items;
       } else {
         return state.dataList;
       }
     },
     async treeList(): Promise<OrganizationItemType[]> {
       const list = await this.list;
-      return buildTree(list);
+      return handleTree(list, "id", "pid");
     }
   },
   actions: {
     /** 获取列表 */
-    async getList() {
+    async getList(form) {
       const that = this;
-      return new Promise(resolve => {
-        getOrganization({
-          limit: 1000
-        }).then(res => {
-          if (res.code == 0) {
-            that.dataList = res.data.items;
-            resolve(res.data.items);
-          } else if (res.code == -1) {
-            resolve(res.msg);
-          }
-        });
-      });
+      return new Promise<ResultType<ResultDataType<OrganizationItemType[]>>>(
+        resolve => {
+          getOrganization(form).then(res => {
+            if (res.code == 0) {
+              that.dataList = res.data.items;
+
+              resolve(res);
+            } else if (res.code == -1) {
+              resolve(res);
+            }
+          });
+        }
+      );
     },
     add(curData: { pid: number; name: string }) {
-      const that = this;
       return new Promise(resolve => {
         addOrganization(curData).then(res => {
           if (res.code == 0) {
-            that.getList();
             resolve(0);
           } else if (res.code == -1) {
             resolve(res.msg);
@@ -83,11 +63,9 @@ export const useOrganizationStore = defineStore({
       });
     },
     edit(curData: { id: number; pid: number; name: string }) {
-      const that = this;
       return new Promise(resolve => {
         editOrganization(curData).then(res => {
           if (res.code == 0) {
-            that.getList();
             resolve(0);
           } else if (res.code == -1) {
             resolve(res.msg);
@@ -96,11 +74,9 @@ export const useOrganizationStore = defineStore({
       });
     },
     del(id: number) {
-      const that = this;
       return new Promise(resolve => {
         delOrganization({ id }).then(res => {
           if (res.code == 0) {
-            that.getList();
             resolve(0);
           } else if (res.code == -1) {
             resolve(res.msg);

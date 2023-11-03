@@ -1,46 +1,40 @@
 /**
- * 用于角色的增删改查
+ * 用户列表
  */
 
 import { store } from "@/store";
 import { defineStore } from "pinia";
-import { getRoleList } from "@/api/role";
-import { handleTree } from "@/utils/tree";
-import { RoleType } from "@/views/system/role-list/utils/type";
+import { getUserList } from "@/api/user";
 import { useRoute } from "vue-router";
 
-export const useRoleStore = defineStore({
-  id: "pure-role",
+export const useUserStore = defineStore({
+  id: "user-store",
   state: () => ({
-    dataList: [] as RoleType[]
+    dataList: [] as UserItemType[]
   }),
   getters: {
-    async list(state): Promise<RoleType[]> {
+    async list(state): Promise<UserItemType[]> {
       const route = useRoute();
-
-      if (state.dataList.length == 0 && route.name != "roleList") {
+      if (state.dataList.length == 0 && route.name != "userList") {
         const res = await this.getList();
         return res.data.items;
       } else {
         return state.dataList;
       }
-    },
-    async treeList(): Promise<RoleType[]> {
-      const list = await this.list;
-      return handleTree(list, "id", "pid");
     }
   },
   actions: {
-    setList(data: RoleType[]) {
+    setList(data: UserItemType[]) {
       this.dataList = data;
     },
     /** 获取列表 */
-    async getList(form) {
+    async getList(form): Promise<ResultType<ResultDataType<UserItemType[]>>> {
       const that = this;
-      return new Promise<ResultType<ResultDataType<RoleType[]>>>(resolve => {
-        getRoleList(form).then(res => {
+      return new Promise(resolve => {
+        getUserList(form).then(res => {
           if (res.code == 0) {
             that.setList(res.data.items);
+            // that.dataList = res.data.items;
             resolve(res);
           } else if (res.code == -1) {
             resolve(res);
@@ -48,10 +42,12 @@ export const useRoleStore = defineStore({
         });
       });
     },
-    add(curData: { pid: number; name: string }) {
+    add(curData: any) {
+      const that = this;
       return new Promise(resolve => {
-        getRoleList(curData).then(res => {
+        getUserList(curData).then(res => {
           if (res.code == 0) {
+            // that.getList();
             resolve(0);
           } else if (res.code == -1) {
             resolve(res.msg);
@@ -60,9 +56,11 @@ export const useRoleStore = defineStore({
       });
     },
     edit(curData: { id: number; pid: number; name: string }) {
+      const that = this;
       return new Promise(resolve => {
-        getRoleList(curData).then(res => {
+        getUserList(curData).then(res => {
           if (res.code == 0) {
+            // that.getList();
             resolve(0);
           } else if (res.code == -1) {
             resolve(res.msg);
@@ -71,9 +69,11 @@ export const useRoleStore = defineStore({
       });
     },
     del(id: number) {
+      const that = this;
       return new Promise(resolve => {
-        getRoleList({ id }).then(res => {
+        getUserList({ id }).then(res => {
           if (res.code == 0) {
+            // that.getList();
             resolve(0);
           } else if (res.code == -1) {
             resolve(res.msg);
@@ -83,6 +83,6 @@ export const useRoleStore = defineStore({
     }
   }
 });
-export function useRoleStoreHook() {
-  return useRoleStore(store);
+export function useUserStoreHook() {
+  return useUserStore(store);
 }

@@ -34,6 +34,7 @@ const {
   // buttonClass,
   onSearch,
   resetForm,
+  handleDelete,
   // handleDatabase,
   handleSizeChange,
   handleCurrentChange,
@@ -197,15 +198,33 @@ onMounted(() => {
           <template #operation="{ row }">
             <div class="flex gap-3">
               <Auth value="/admin/user/edit">
-                <el-button class="reset-margin" link type="info" :size="size">
+                <el-button
+                  class="reset-margin"
+                  link
+                  type="info"
+                  :size="size"
+                  @click="openDialog('编辑', row)"
+                >
                   编辑
                 </el-button>
               </Auth>
 
               <Auth value="/admin/user/del">
-                <el-button class="reset-margin" link type="danger" :size="size">
-                  删除
-                </el-button>
+                <el-popconfirm
+                  :title="`是否确认删除用户名称为${row.name}的这条数据`"
+                  @confirm="handleDelete(row)"
+                >
+                  <template #reference>
+                    <el-button
+                      class="reset-margin"
+                      link
+                      type="danger"
+                      :size="size"
+                    >
+                      删除
+                    </el-button>
+                  </template>
+                </el-popconfirm>
               </Auth>
             </div>
           </template>

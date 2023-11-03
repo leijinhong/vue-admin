@@ -10,9 +10,10 @@ import {
 import { addDialog } from "@/components/ReDialog";
 import { useOrganizationStoreHook } from "@/store/modules/organization";
 import type Node from "element-plus/es/components/tree/src/model/node";
+import { handleTree } from "@pureadmin/utils";
 
 export function useHook() {
-  const { list, treeList } = useOrganizationStoreHook();
+  const { getList, add, edit, del, treeList } = useOrganizationStoreHook();
   const dataSource = ref<OrganizationItemType[]>([]);
   const loading = ref(false);
   const formRef = ref();
@@ -88,7 +89,9 @@ export function useHook() {
 
   async function onSearch() {
     loading.value = true;
-    dataSource.value = await treeList;
+
+    const res = await getList({});
+    dataSource.value = await handleTree(res.data.items, "id", "pid");
     loading.value = false;
   }
   onMounted(() => {
