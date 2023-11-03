@@ -143,7 +143,6 @@ onBeforeUnmount(() => {
                   v-model="ruleForm.captcha"
                   placeholder="输入验证码"
                   :prefix-icon="useRenderIcon('ri:shield-keyhole-line')"
-                  @keyup.enter="onLogin(ruleFormRef)"
                 >
                   <template v-slot:append>
                     <img
