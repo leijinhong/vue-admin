@@ -1,6 +1,7 @@
 import { defineComponent, ref, onMounted, h, unref } from "vue";
 import { useUserStoreHook } from "@/store/modules/userStore";
 import { DialogOptions, addDialog, closeDialog } from "../ReDialog";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Bar from "./bar";
 
 export default defineComponent({
@@ -106,12 +107,13 @@ export default defineComponent({
         ></div>
         <el-select
           class="w-full"
+          style="--el-select-input-font-size:20px;"
           model-value={props.modelValue}
           multiple={props.selection}
           clearable
           filterable
           placeholder={props.placeholder}
-          suffix-icon={""}
+          suffix-icon={useRenderIcon("fluent:people-add-28-filled")}
         >
           {dataList.value.map(item => (
             <el-option key={item.id} label={item.nickname} value={item.id} />
