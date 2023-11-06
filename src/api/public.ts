@@ -22,4 +22,12 @@ export const getOperationMode = (data?: object) => {
 export const getCustomerList = (data?: object) => {
   return http.request<any>("post", "/admin/customer/list");
 };
+/** 获取产品线的下拉数据 */
+export const getProductList = (data?: object) => {
+  return http.request<any>("post", "/admin/product/list");
+};
+/** 获取产品分类的下拉数据 */
+export const getProductType = (data?: object) => {
+  return http.request<any>("post", "/admin/product/type");
+};
 

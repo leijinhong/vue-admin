@@ -179,5 +179,116 @@ export default [
       };
     }
   },
+   // 产品线
+   {
+    url: "/admin/product/list",
+    method: "post",
+    response: () => {
+      return {
+        code: 0,
+        data: {
+          items: [
+            {
+              label:'密码基础硬件',
+              value:'0',
+            },
+            {
+              label:'密码管理与服务平台',
+              value:'1',
+            },
+            {
+              label:'密码中间件',
+              value:'2',
+            },
+            {
+              label:'数据安全',
+              value:'3',
+            },
+            {
+              label:'网络安全',
+              value:'4',
+            },
+            {
+              label:'邮件安全',
+              value:'5',
+            },
+            {
+              label:'视频安全',
+              value:'6',
+            },
+            {
+              label:'工业互联网安全',
+              value:'7',
+            },
+            {
+              label:'物联网安全',
+              value:'8',
+            },
+            {
+              label:'即时通讯安全',
+              value:'9',
+            }
+          ],
+        },
+        msg: "ok"
+      };
+    }
+  },
+  // 产品分类
+  {
+    url: "/admin/product/type",
+    method: "post",
+    response: () => {
+      return {
+        code: 0,
+        data: {
+          items: [
+            {
+              label:'密码基础硬件',
+              value:'0',
+            },
+            {
+              label:'密码管理与服务平台',
+              value:'1',
+            },
+            {
+              label:'密码中间件',
+              value:'2',
+            },
+            {
+              label:'数据安全',
+              value:'3',
+            },
+            {
+              label:'网络安全',
+              value:'4',
+            },
+            {
+              label:'邮件安全',
+              value:'5',
+            },
+            {
+              label:'视频安全',
+              value:'6',
+            },
+            {
+              label:'工业互联网安全',
+              value:'7',
+            },
+            {
+              label:'物联网安全',
+              value:'8',
+            },
+            {
+              label:'即时通讯安全',
+              value:'9',
+            }
+          ],
+        },
+        msg: "ok"
+      };
+    }
+  },
+
  
 ] as MockMethod[];

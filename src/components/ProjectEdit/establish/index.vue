@@ -217,7 +217,7 @@
           <template #finalPrice>含税成交价<br />(单位：元)</template>
           <template #untaxedPrice>未税价<br />(单位：元)</template>
           <template #operation="{ row }">
-            <span style="color: red">删除</span>
+            <span style="color: red" @click="">删除</span>
           </template>
         </pure-table>
         <div class="flex gap-3 mt-5">
@@ -229,10 +229,12 @@
             "
             type="primary"
             :icon="useRenderIcon(AddFill)"
+            @click="openDialog('编辑项目', AddProduct, {}, () => {})"
           >
             添加
           </el-button>
           <el-button
+            v-if="editForm.product_list.length > 1"
             style="
               padding: 10px 20px 10px 10px;
               --el-font-size-base: 16px;
@@ -281,7 +283,9 @@ const {
   columns,
   useRenderIcon,
   AddFill,
-  Delete
+  Delete,
+  AddProduct,
+  openDialog
 } = useEditForm();
 defineExpose({ editForm, formRef });
 </script>
