@@ -19,7 +19,7 @@ export function useHook() {
    */
   const form = reactive({
     nickname: "",
-    userid: -1,
+    userid: null,
     time: 0
   });
   /** 控制详情抽屉 */
@@ -305,7 +305,6 @@ export function useHook() {
     const searchDataFn = () => {
       return isSearch.value ? form : {};
     };
-    console.log(searchDataFn());
 
     const { data } = await getHoursList(
       toRaw({

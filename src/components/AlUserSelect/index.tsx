@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, h } from "vue";
+import { defineComponent, ref, onMounted, h, unref } from "vue";
 import { useUserStoreHook } from "@/store/modules/userStore";
 import { DialogOptions, addDialog, closeDialog } from "../ReDialog";
 import Bar from "./bar";
@@ -6,20 +6,29 @@ import Bar from "./bar";
 export default defineComponent({
   name: "AlUserSelect",
   props: {
-    modelValue: {
-      type: Number,
-      default: -1
-    },
+    modelValue: [Number, Array],
     title: {
       type: String
     },
     placeholder: {
       type: String
+    },
+    highlightCurrentRow: {
+      type: Boolean,
+      default: true
+    },
+    selection: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ["update:modelValue", "change"],
   setup(props, { emit }) {
+    const { list } = useUserStoreHook();
+
+    const dataList = ref([]);
     const BarRef = ref();
+    const selectedRow = ref([]);
 
     function openDialog() {
       addDialog({
@@ -28,7 +37,16 @@ export default defineComponent({
         /* 自定义表头 */
         title: props.title,
         /* 自定义内容 */
-        contentRenderer: () => h(Bar, { ref: BarRef, mv: props.modelValue }),
+        contentRenderer: () =>
+          h(Bar, {
+            ref: BarRef,
+            mv: props.modelValue,
+            highlightCurrentRow: props.highlightCurrentRow,
+            selection: props.selection,
+            onChangeBar: event => {
+              selectedRow.value = event;
+            }
+          }),
         draggable: true,
         fullscreenIcon: true,
         closeOnClickModal: false,
@@ -58,18 +76,28 @@ export default defineComponent({
         ]
       });
 
-      function chores(options: DialogOptions, index: number, item) {
-        emit("change", item);
-        emit("update:modelValue", item.id);
+      function chores(options: DialogOptions, index: number) {
+        const list = unref(selectedRow);
+
+        emit("change", list);
+        if (list.length > 1) {
+          emit(
+            "update:modelValue",
+            list.map(i => i.id)
+          );
+        } else {
+          emit("update:modelValue", list[0] ? list[0].id : null);
+        }
         closeDialog(options, index);
       }
       function handleCB(options: DialogOptions, index: number) {
-        const FormRef = BarRef.value.getItem();
-        console.log(FormRef);
-        chores(options, index, FormRef);
+        chores(options, index);
       }
     }
 
+    onMounted(async () => {
+      dataList.value = await list;
+    });
     return () => (
       <div class="relative">
         <div
@@ -78,12 +106,17 @@ export default defineComponent({
         ></div>
         <el-select
           class="w-full"
-          model-value={null}
+          model-value={props.modelValue}
+          multiple={props.selection}
           clearable
           filterable
           placeholder={props.placeholder}
           suffix-icon={""}
-        ></el-select>
+        >
+          {dataList.value.map(item => (
+            <el-option key={item.id} label={item.nickname} value={item.id} />
+          ))}
+        </el-select>
       </div>
     );
   }

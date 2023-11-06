@@ -211,7 +211,6 @@ export function useHook() {
     const searchDataFn = () => {
       return isSearch.value ? form : {};
     };
-    console.log(searchDataFn());
 
     const { data } = await getFileMyList(
       toRaw({

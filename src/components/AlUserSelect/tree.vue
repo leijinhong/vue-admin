@@ -2,7 +2,6 @@
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useOrganizationStoreHook } from "@/store/modules/organization";
 import { ref, computed, watch, onMounted, getCurrentInstance } from "vue";
-
 import Dept from "@iconify-icons/ri/git-branch-line";
 import Reset from "@iconify-icons/ri/restart-line";
 import Search from "@iconify-icons/ep/search";
@@ -11,6 +10,17 @@ import OfficeBuilding from "@iconify-icons/ep/office-building";
 import LocationCompany from "@iconify-icons/ep/add-location";
 import ExpandIcon from "./svg/expand.svg?component";
 import UnExpandIcon from "./svg/unexpand.svg?component";
+import { useUserStoreHook } from "@/store/modules/user";
+import { useUserStoreHook as useUserStoreStoreHook } from "@/store/modules/userStore";
+import { isArray, isNumber } from "@pureadmin/utils";
+
+const props = defineProps<{
+  mv: number | number[] | null;
+  isReset: boolean;
+}>();
+const emits = defineEmits<{
+  (e: "change", id: number): void;
+}>();
 
 interface Tree {
   id: number;
@@ -29,16 +39,8 @@ const defaultProps = {
   children: "children",
   label: "name"
 };
+const { list } = useUserStoreStoreHook();
 const { treeList } = useOrganizationStoreHook();
-const buttonClass = computed(() => {
-  return [
-    "!h-[20px]",
-    "reset-margin",
-    "!text-gray-500",
-    "dark:!text-white",
-    "dark:hover:!text-primary"
-  ];
-});
 
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true;
@@ -46,8 +48,9 @@ const filterNode = (value: string, data: Tree) => {
 };
 
 function nodeClick(value) {
-  const nodeId = value.$treeNodeId;
-  highlightMap.value[nodeId] = highlightMap.value[nodeId]?.highlight
+  const nodeId = value.id;
+  const flag = highlightMap.value[nodeId]?.highlight;
+  highlightMap.value[nodeId] = flag
     ? Object.assign({ id: nodeId }, highlightMap.value[nodeId], {
         highlight: false
       })
@@ -59,6 +62,9 @@ function nodeClick(value) {
       v.highlight = false;
     }
   });
+
+  // 为true表示当前选中，但是在上面会处理成不为选中
+  emits("change", !flag ? nodeId : -1);
 }
 
 function toggleRowExpansionAll(status) {
@@ -74,15 +80,28 @@ function onReset() {
   highlightMap.value = {};
   searchValue.value = "";
   toggleRowExpansionAll(true);
+  emits("change", -1);
 }
 
 watch(searchValue, val => {
   treeRef.value!.filter(val);
 });
 
+watch(
+  () => props.isReset,
+  val => {
+    if (val) {
+      onReset();
+    }
+  }
+);
+
 onMounted(async () => {
   const data = await treeList;
   treeData.value = data;
+
+  const { organization_id } = useUserStoreHook().userInfo;
+  nodeClick({ id: organization_id });
 });
 </script>
 
@@ -123,6 +142,7 @@ onMounted(async () => {
     >
       <template #default="{ node, data }">
         <span
+          :data-id="node.data.id"
           :class="[
             'pl-1',
             'pr-1',
@@ -133,10 +153,10 @@ onMounted(async () => {
             searchValue.trim().length > 0 &&
               node.label.includes(searchValue) &&
               'text-red-500',
-            highlightMap[node.id]?.highlight ? 'dark:text-primary' : ''
+            highlightMap[node.data.id]?.highlight ? 'text-primary' : ''
           ]"
           :style="{
-            background: highlightMap[node.id]?.highlight
+            background: highlightMap[node.data.id]?.highlight
               ? 'var(--el-color-primary-light-7)'
               : 'transparent'
           }"

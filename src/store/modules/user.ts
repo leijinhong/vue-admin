@@ -15,7 +15,9 @@ export const useUserStore = defineStore({
     username:
       storageSession().getItem<DataInfo<number>>(sessionKey)?.username ?? "",
     // 页面级别权限
-    roles: storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? []
+    roles: storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? [],
+    userInfo:
+      storageSession().getItem<DataInfo<number>>(sessionKey)?.userInfo ?? {}
   }),
   actions: {
     /** 存储用户名 */
@@ -26,17 +28,22 @@ export const useUserStore = defineStore({
     SET_ROLES(roles: Array<string>) {
       this.roles = roles;
     },
+    SET_USERINFO(info) {
+      this.userInfo = info;
+    },
     /** 登入 */
     async loginByUsername(data) {
-      return new Promise<ResultType<{
-        nickname: string,
-        token: string
-      }>>((resolve, reject) => {
+      return new Promise<
+        ResultType<{
+          nickname: string;
+          token: string;
+        }>
+      >((resolve, reject) => {
         // 登录api
         getLogin(data)
           .then(data => {
             if (data) {
-              const { nickname, token } = data.data
+              const { nickname, token } = data.data;
               getRulePermission().then(res => {
                 if (res.code == 0) {
                   setToken({
@@ -44,11 +51,12 @@ export const useUserStore = defineStore({
                     roles: res.data,
                     accessToken: token,
                     refreshToken: token,
-                    expires: +new Date()
+                    expires: +new Date(),
+                    userInfo: data.data
                   });
                   resolve(data);
                 }
-              })
+              });
             }
           })
           .catch(error => {
@@ -60,11 +68,12 @@ export const useUserStore = defineStore({
     logOut() {
       this.username = "";
       this.roles = [];
+      this.userInfo = {};
       removeToken();
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
       resetRouter();
       router.push("/login");
-    },
+    }
     // /** 刷新`token` */
     // async handRefreshToken(data) {
     //   return new Promise<RefreshTokenResult>((resolve, reject) => {

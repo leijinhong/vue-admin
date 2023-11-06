@@ -2,7 +2,7 @@ import { reactive, ref, h, toRaw, watch } from "vue";
 import { type PaginationProps } from "@pureadmin/table";
 import { useUserStoreHook } from "@/store/modules/userStore";
 import { useAppStoreHook } from "@/store/modules/app";
-export const useHook = () => {
+function useHook() {
   const { getList } = useUserStoreHook();
   const dataList = ref<UserItemType[]>();
   const loading = ref(true);
@@ -13,7 +13,6 @@ export const useHook = () => {
     nickname: "",
     username: ""
   });
-
   // 列表表格内容
   const columns: TableColumnList = [
     {
@@ -51,27 +50,42 @@ export const useHook = () => {
   // 分页器配置
   const pagination = reactive<PaginationProps>({
     total: 0,
-    pageSize: 1000,
+    pageSize: 10,
     currentPage: 1,
     background: true,
     layout: "",
-    pageSizes: []
+    pageSizes: [10, 20, 50, 100, 200]
   });
-  async function onSearch(page = 1, id?: number, flag?: boolean) {
-    loading.value = true;
-    if (flag) {
-      isSearch.value = true;
+  watch(
+    () => useAppStoreHook().device,
+    n => {
+      pagination.layout =
+        n == "mobile"
+          ? "prev,pager,next"
+          : "total, sizes, prev, pager, next, jumper";
+    },
+    {
+      immediate: true
     }
+  );
+  async function onSearch(page = 1, id?: number, form = {}) {
+    loading.value = true;
+    // if (flag) {
+    //   isSearch.value = true;
+    // }
+    // console.log(form);
 
-    const searchDataFn = () => {
-      return isSearch.value ? { ...form, id } : { id };
-    };
+    // const searchDataFn = () => {
+    //   return isSearch.value ? { ...form, id } : { id };
+    // };
 
     const { data } = await getList(
       toRaw({
         limit: pagination.pageSize,
         page: page,
-        ...searchDataFn()
+        ...form,
+        id
+        // ...searchDataFn()
       })
     );
     dataList.value = data.items;
@@ -80,15 +94,15 @@ export const useHook = () => {
 
     loading.value = false;
   }
-  function handleSizeChange(val: number, id?: number) {
+  function handleSizeChange(val: number, id?: number, form = {}) {
     pagination.currentPage = 1;
     pagination.pageSize = val;
-    onSearch(1, id);
+    onSearch(1, id, form);
   }
 
-  function handleCurrentChange(val: number, id?: number) {
+  function handleCurrentChange(val: number, id?: number, form = {}) {
     // console.log(`current page: ${val}`);
-    onSearch(val, id);
+    onSearch(val, id, form);
   }
   const resetForm = formEl => {
     if (!formEl) return;
@@ -96,7 +110,6 @@ export const useHook = () => {
     formEl.resetFields();
     onSearch();
   };
-
   return {
     form,
     columns,
@@ -108,4 +121,5 @@ export const useHook = () => {
     handleCurrentChange,
     resetForm
   };
-};
+}
+export default useHook;

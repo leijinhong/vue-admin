@@ -1,22 +1,33 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import useHook from "./utils/hook";
+import { ref, onMounted, watch } from "vue";
+import { useHook } from "./utils/hook";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
 import { PureTableBar } from "@/components/RePureTableBar";
+import { useThrottleFn } from "@vueuse/core";
+import { isArray, isObject } from "@pureadmin/utils";
+import { computed } from "vue";
+import { nextTick } from "process";
 
-const porps = defineProps<{
-  form: {
-    nickname: string;
-    username: string;
-    email: string;
-  };
+const props = defineProps<{
+  id: number;
+  mv: number | number[] | null;
+  highlightCurrentRow?: boolean;
+  selection?: boolean;
 }>();
 
-const form = ref(porps.form);
+const emits = defineEmits<{
+  (e: "reset", v: boolean): void;
+  (e: "change", v: UserItemType[]): void;
+}>();
+
+const tableRef = ref();
+// 选中行
+const selectedRow = ref<UserItemType[]>([]);
 const formRef = ref();
 const {
+  form,
   columns,
   pagination,
   dataList,
@@ -27,6 +38,72 @@ const {
   resetForm
 } = useHook();
 
+const handleReset = useThrottleFn(() => {
+  resetForm(formRef.value);
+  emits("reset", true);
+  setTimeout(() => {
+    emits("reset", false);
+  }, 400);
+}, 500);
+function handleCurrentChangeRow(event: UserItemType | UserItemType[]) {
+  // 为多选时 点击行也会触发需要过滤
+  if (isObject(event) && props.selection) return;
+
+  if (isArray(event)) {
+    selectedRow.value = event;
+  } else {
+    selectedRow.value = [event];
+  }
+
+  emits("change", selectedRow.value);
+}
+watch(
+  [() => props.mv, () => dataList.value],
+  ([mv, list]) => {
+    if (mv != null && list) {
+      if (isArray(mv)) {
+        nextTick(() => {
+          // 默认多选状态
+          const rows = list.filter(i => mv.includes(i.id));
+          const { toggleRowSelection } = tableRef.value.getTableRef();
+          if (rows.length) {
+            rows.forEach(row => {
+              toggleRowSelection(row, undefined);
+            });
+          }
+        });
+      } else {
+        // 为单选选中状态
+        const item = list.find(i => i.id == mv);
+        const { setCurrentRow } = tableRef.value.getTableRef();
+        setCurrentRow(item);
+      }
+    }
+  },
+  {
+    immediate: true
+  }
+);
+watch(
+  () => props.selection,
+  n => {
+    if (n && props.highlightCurrentRow == false) {
+      columns.unshift({
+        type: "selection",
+        align: "left"
+      });
+    }
+  },
+  {
+    immediate: true
+  }
+);
+watch(
+  () => props.id,
+  n => {
+    onSearch(1, n);
+  }
+);
 onMounted(() => {
   onSearch();
 });
@@ -60,6 +137,7 @@ onMounted(() => {
         </el-form-item>
         <el-form-item label="" class="!mb-0 md:mt-0" prop="email">
           <el-input
+            type="email"
             v-model="form.email"
             placeholder="请输入邮箱"
             clearable
@@ -77,7 +155,7 @@ onMounted(() => {
           type="primary"
           :icon="useRenderIcon(Search)"
           :loading="loading"
-          @click="onSearch(1, true)"
+          @click="onSearch(1, props.id, true)"
         >
           查询
         </el-button>
@@ -88,7 +166,7 @@ onMounted(() => {
             height: var(--el-component-size) !important;
           "
           :icon="useRenderIcon(Refresh)"
-          @click="resetForm(formRef)"
+          @click="handleReset"
         >
           重置
         </el-button>
@@ -101,9 +179,12 @@ onMounted(() => {
     >
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
+          :max-height="408"
           align-whole="center"
           showOverflowTooltip
           table-layout="auto"
+          ref="tableRef"
+          :highlight-current-row="highlightCurrentRow"
           :loading="loading"
           :size="size"
           :data="dataList"
@@ -113,9 +194,10 @@ onMounted(() => {
           :header-cell-style="{
             color: 'var(--el-text-color-primary)'
           }"
-          stripe
-          @page-size-change="handleSizeChange"
-          @page-current-change="handleCurrentChange"
+          @page-size-change="handleSizeChange($event, props.id)"
+          @page-current-change="handleCurrentChange($event, props.id)"
+          @current-change="handleCurrentChangeRow"
+          @selection-change="handleCurrentChangeRow"
         >
         </pure-table>
       </template>
@@ -123,4 +205,11 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+:deep(.el-table .el-table__row) {
+  background-color: white;
+}
+:deep(.el-table td.el-table__cell, .el-table th.el-table__cell.is-leaf) {
+  border-bottom: var(--el-table-border) !important;
+}
+</style>

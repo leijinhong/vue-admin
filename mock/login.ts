@@ -10,16 +10,18 @@ export default [
         return {
           code: 0,
           data: {
-            "nickname": "超级管理员",
-            "token": "c95524bc2d35d941666c536c3e6a3d9f"
+            nickname: "超级管理员",
+            token: "c95524bc2d35d941666c536c3e6a3d9f",
+            organization_id: 1
           }
         };
       } else {
         return {
           code: 0,
           data: {
-            "nickname": body.username,
-            "token": "c95524bc2d35d941666c536c3e6a3d9f"
+            nickname: body.username,
+            token: "c95524bc2d35d941666c536c3e6a3d9f",
+            organization_id: 1
           }
         };
       }
@@ -31,7 +33,7 @@ export default [
     response: () => {
       return {
         code: 0,
-        data: ['*']
+        data: ["*"]
       };
     }
   }

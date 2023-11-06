@@ -12,6 +12,7 @@ import { bg, avatar, illustration } from "./utils/static";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { ref, reactive, toRaw, onMounted, onBeforeUnmount } from "vue";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
+import { useDebounceFn } from "@vueuse/core";
 
 import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
@@ -44,7 +45,7 @@ const codeTimestamp = ref(+new Date());
 const refreshCode = () => {
   codeTimestamp.value = +new Date();
 };
-const onLogin = async (formEl: FormInstance | undefined) => {
+const onLogin = useDebounceFn(async (formEl: FormInstance | undefined) => {
   loading.value = true;
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
@@ -65,7 +66,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
       return fields;
     }
   });
-};
+}, 500);
 
 /** 使用公共函数，避免`removeEventListener`失效 */
 function onkeypress({ code }: KeyboardEvent) {
