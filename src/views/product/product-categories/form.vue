@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { ref, Ref } from "vue";
-import { useOrganizationStoreHook } from "@/store/modules/organization";
+import { ref, computed } from "vue";
+import { useClassificationStoreStoreHook } from "@/store/modules/classification";
 import { formRules } from "./utils/rule";
 import { onMounted } from "vue";
+import { Ref } from "vue";
 
 interface PropsType {
-  formInline: OrganizationItemType;
+  formInline: CategoriesType;
 }
 const defaultProps = {
   children: "children",
   label: "name",
   value: "id"
 };
-const { treeList } = useOrganizationStoreHook();
+const { treeList } = useClassificationStoreStoreHook();
 const dataSource: Ref<CategoriesType[]> = ref([
   { name: "根节点", pid: null, id: null }
 ]);
@@ -39,10 +40,10 @@ onMounted(async () => {
     ref="ruleFormRef"
     :model="newFormInline"
     :rules="formRules"
-    label-width="100px"
+    label-width="90px"
     class="mt-4"
   >
-    <el-form-item label="上一级组织" prop="pid">
+    <el-form-item label="上级分类" prop="pid">
       <el-tree-select
         :props="defaultProps"
         v-model="newFormInline.pid"
@@ -52,11 +53,11 @@ onMounted(async () => {
         :render-after-expand="false"
       />
     </el-form-item>
-    <el-form-item label="组织名称" prop="name">
+    <el-form-item label="分类名称" prop="name">
       <el-input
         v-model="newFormInline.name"
         clearable
-        placeholder="请输入组织名称"
+        placeholder="请输入分类名称"
       />
     </el-form-item>
   </el-form>

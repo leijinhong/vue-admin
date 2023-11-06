@@ -1,183 +1,99 @@
-import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { message } from "@/utils/message";
-import { getMemberList } from "@/api/member";
-import { usePublicHooks } from "../../hooks";
+import { ref, onMounted, h } from "vue";
 import { addDialog } from "@/components/ReDialog";
-import { type PaginationProps } from "@pureadmin/table";
-import { reactive, ref, onMounted, h, toRaw, computed, watch } from "vue";
-import { priceToThousands } from "@pureadmin/utils";
-import { ElMessageBox } from "element-plus";
-import useExecl from "@/hooks/useExecl";
-const { VITE_CONFIG_URL } = import.meta.env;
+import { useClassificationStoreStoreHook } from "@/store/modules/classification";
+import type Node from "element-plus/es/components/tree/src/model/node";
+import { handleTree } from "@pureadmin/utils";
 
-export function useRole() {
-  const selectValue = ref("name");
-
-  /**
-   * @description 搜索表单数据
-   * @param is_vip              是否vip会员
-   * @param type                会员类型
-   * @param smrz                是否实名认证
-   * @param phone               手机 phone/会员编号code/名称name 搜索
-   * @param code
-   * @param name
-   */
-  const form = reactive({
-    is_vip: null,
-    type: null,
-    smrz: null,
-    keyword: ""
-  });
-  /** 控制详情抽屉 */
-  const drawer = ref(false);
+export function useHook() {
+  const { getList, add, edit, del } = useClassificationStoreStoreHook();
+  const dataSource = ref<CategoriesType[]>([]);
+  const loading = ref(false);
   const formRef = ref();
-  const dataList = ref([]);
-  const loading = ref(true);
-  const switchLoadMap = ref({});
-  const { switchStyle } = usePublicHooks();
-  const selectList = ref([]);
-  // 分页器配置
-  const pagination = reactive<PaginationProps>({
-    total: 0,
-    pageSize: 10,
-    currentPage: 1,
-    background: true,
-    pageSizes: [10, 20, 50, 100, 200]
-  });
+  const defaultProps = {
+    label: "name"
+  };
 
-  // 会员列表表格内容
-  const columns: TableColumnList = [
-    {
-      type: "selection",
-      align: "left"
-      // width: 50
-    },
-    {
-      label: "会员编号",
-      prop: "id",
-      width: 120
-    },
-    {
-      label: "昵称",
-      prop: "name",
-      cellRenderer: scope => <div>{scope.row.name || scope.row.nickname}</div>
-    },
-    {
-      label: "手机号码",
-      prop: "phone",
-      width: 150
-    },
-    {
-      label: "所在地区",
-      prop: "resumeInfo.site"
-    },
-    {
-      label: "会员类型",
-      prop: "type",
-      cellRenderer: scope => <div>{scope.row.type}</div>
-    },
-    {
-      label: "VIP会员",
-      prop: "is_vip",
-      cellRenderer: scope => <div>{scope.row.is_vip == 1 ? "是" : "否"}</div>
-    },
-    {
-      label: "会员状态",
-      prop: "status",
-      cellRenderer: scope => (
-        <el-switch
-          size={scope.props.size}
-          loading={switchLoadMap.value[scope.index]?.loading}
-          model-value={scope.row.status}
-          active-value={1}
-          inactive-value={2}
-          active-text="已启用"
-          inactive-text="已停用"
-          inline-prompt
-          style={switchStyle.value}
-        />
-      ),
-      width: 100
-    },
-    {
-      label: "注册时间",
-      prop: "registerTime",
-      width: 180
-    },
-    {
-      label: "操作",
-      fixed: "right",
-      slot: "operation",
-      width: 150
-    }
-  ];
-
-  function handleDelete(row) {
-    message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
-    onSearch(pagination.currentPage);
+  function handleDelete(node: Node, data: CategoriesType) {
+    del(data.id).then(res => {
+      if (res == 0) {
+        message(`您删除了分类名称为${data.name}的这条数据`, {
+          type: "success"
+        });
+        onSearch();
+      }
+    });
   }
 
-  function handleSizeChange(val: number) {
-    pagination.currentPage = 1;
-    pagination.pageSize = val;
-    onSearch();
+  function openDialog(title = "新增", data = { pid: null }) {
+    addDialog({
+      title: `${title}菜单`,
+      props: {
+        formInline: data
+      },
+      width: "40%",
+      draggable: true,
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      contentRenderer: () => h(editForm, { ref: formRef }),
+      beforeSure: (done, { options }) => {
+        const FormRef = formRef.value.getRef();
+        const curData = formRef.value.newFormInline;
+        function chores() {
+          // useUserStoreHook().initMenu();
+          onSearch();
+          message(title + "成功", { type: "success" });
+          loading.value = false;
+          done(); // 关闭弹框
+        }
+        FormRef.validate(valid => {
+          if (valid) {
+            console.log("curData", curData);
+            loading.value = true;
+            // 表单规则校验通过
+            if (["新增", "添加"].includes(title)) {
+              add(curData).then(res => {
+                if (res == 0) {
+                  chores();
+                }
+                loading.value = false;
+              });
+            } else {
+              delete curData.child;
+              delete curData.showTooltip;
+              edit(curData).then(res => {
+                if (res == 0) {
+                  chores();
+                }
+                loading.value = false;
+              });
+            }
+          }
+        });
+      }
+    });
   }
 
-  function handleCurrentChange(val: number) {
-    // console.log(`current page: ${val}`);
-    onSearch(val);
-  }
-
-  function handleSelectionChange(val) {
-    selectList.value = val;
-  }
-
-  async function onSearch(page = 1) {
+  async function onSearch() {
     loading.value = true;
-    const { is_vip, smrz, type } = form;
-    const { data } = await getMemberList(
-      toRaw({
-        limit: pagination.pageSize,
-        page: page,
-        is_vip,
-        smrz,
-        type,
-        [selectValue.value]: form["keyword"]
-      })
-    );
-    dataList.value = data.data;
-    pagination.total = data.total || 0;
-    pagination.currentPage = page;
 
+    const res = await getList({
+      limit: 1000
+    });
+    dataSource.value = await handleTree(res.data.items, "id", "pid");
     loading.value = false;
   }
-
-  const resetForm = formEl => {
-    if (!formEl) return;
-    formEl.resetFields();
+  onMounted(() => {
     onSearch();
-  };
+  });
 
-  const exportCheckItem = () => {
-    useExecl(columns, selectList.value);
-  };
   return {
-    selectValue,
-    form,
     loading,
-    columns,
-    dataList,
-    pagination,
-    drawer,
-    // buttonClass,
-    onSearch,
-    resetForm,
+    dataSource,
+    defaultProps,
     handleDelete,
-    // handleDatabase,
-    handleSizeChange,
-    handleCurrentChange,
-    handleSelectionChange,
-    exportCheckItem
+    openDialog,
+    onSearch
   };
 }

@@ -21,13 +21,13 @@ defineOptions({
 });
 </script>
 <template>
-  <div class="main p-5 bg-white" v-loading="loading">
+  <div class="main p-5 rounded-[10px] shadow-1 bg-bg_color" v-loading="loading">
     <div class="flex px-3 pb-3">
       <Auth value="/admin/user/add">
         <el-button
           type="primary"
           :icon="useRenderIcon(AddFill)"
-          @click="openDialog('新增', { pid: 0 })"
+          @click="openDialog('新增')"
         >
           新增
         </el-button>
@@ -36,7 +36,7 @@ defineOptions({
         <el-button
           type="primary"
           :icon="useRenderIcon(AddFill)"
-          @click="openDialog('新增', { pid: 0 })"
+          @click="openDialog('新增')"
         >
           导入
         </el-button>
@@ -76,7 +76,7 @@ defineOptions({
                 link
                 type="primary"
                 :icon="useRenderIcon(EditPen)"
-                @click="openDialog('编辑', { type: 1, ...data })"
+                @click="openDialog('编辑', data)"
               >
                 编辑
               </el-button>
@@ -84,7 +84,7 @@ defineOptions({
 
             <Auth value="/admin/user/add">
               <el-popconfirm
-                :title="`是否确认删除菜单名称为${node.label}的这条数据`"
+                :title="`是否确认删除组织名称为${node.label}的这条数据`"
                 @confirm="handleDelete(node, data)"
               >
                 <template #reference>

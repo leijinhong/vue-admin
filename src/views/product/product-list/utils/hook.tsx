@@ -1,89 +1,107 @@
-import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { message } from "@/utils/message";
-import { getMemberList } from "@/api/member";
 import { usePublicHooks } from "../../hooks";
-import { addDialog } from "@/components/ReDialog";
+import { DialogOptions, addDialog, closeDialog } from "@/components/ReDialog";
 import { type PaginationProps } from "@pureadmin/table";
-import { reactive, ref, onMounted, h, toRaw, computed, watch } from "vue";
-import { priceToThousands } from "@pureadmin/utils";
+import { reactive, ref, h, toRaw, watch } from "vue";
+import { cloneDeep } from "@pureadmin/utils";
 import { ElMessageBox } from "element-plus";
 import useExecl from "@/hooks/useExecl";
-const { VITE_CONFIG_URL } = import.meta.env;
+import {
+  getProductList,
+  addProductList,
+  editProductList,
+  delProductList
+} from "@/api/product";
+import { useAppStoreHook } from "@/store/modules/app";
 
-export function useRole() {
+export function useHook() {
   const selectValue = ref("name");
 
   /**
    * @description 搜索表单数据
-   * @param is_vip              是否vip会员
-   * @param type                会员类型
-   * @param smrz                是否实名认证
-   * @param phone               手机 phone/会员编号code/名称name 搜索
-   * @param code
-   * @param name
    */
   const form = reactive({
-    is_vip: null,
-    type: null,
-    smrz: null,
-    keyword: ""
+    code: "",
+    product_name: "",
+    line: [],
+    morphology: null
   });
-  /** 控制详情抽屉 */
-  const drawer = ref(false);
+  const lineList = [
+    "密码基础硬件",
+    "密码管理与服务平台",
+    "密码中间件",
+    "数据安全",
+    "网络安全",
+    "邮件安全",
+    "视频安全",
+    "工业互联网安全",
+    "物联网安全",
+    "即时通讯安全"
+  ];
   const formRef = ref();
-  const dataList = ref([]);
+  const dataList = ref<ProductItemType[]>();
   const loading = ref(true);
   const switchLoadMap = ref({});
   const { switchStyle } = usePublicHooks();
   const selectList = ref([]);
+  const isSearch = ref(false);
+
   // 分页器配置
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
     background: true,
+    layout: "",
     pageSizes: [10, 20, 50, 100, 200]
   });
+  watch(
+    () => useAppStoreHook().device,
+    n => {
+      pagination.layout =
+        n == "mobile"
+          ? "prev,pager,next"
+          : "total, sizes, prev, pager, next, jumper";
+    },
+    {
+      immediate: true
+    }
+  );
 
-  // 会员列表表格内容
+  // 列表表格内容
   const columns: TableColumnList = [
     {
       type: "selection",
       align: "left"
-      // width: 50
     },
     {
-      label: "会员编号",
-      prop: "id",
+      label: "产品编号",
+      prop: "number",
       width: 120
     },
     {
-      label: "昵称",
-      prop: "name",
-      cellRenderer: scope => <div>{scope.row.name || scope.row.nickname}</div>
+      label: "产品名称",
+      prop: "category_name"
     },
     {
-      label: "手机号码",
-      prop: "phone",
-      width: 150
+      label: "产品线",
+      prop: "line"
     },
     {
-      label: "所在地区",
-      prop: "resumeInfo.site"
+      label: "产品形态",
+      prop: "post"
     },
     {
-      label: "会员类型",
-      prop: "type",
-      cellRenderer: scope => <div>{scope.row.type}</div>
+      label: "软著名称",
+      prop: "roles"
     },
     {
-      label: "VIP会员",
-      prop: "is_vip",
-      cellRenderer: scope => <div>{scope.row.is_vip == 1 ? "是" : "否"}</div>
+      label: "含税单价（单位：元）",
+      prop: "catalog_price"
     },
     {
-      label: "会员状态",
+      label: "状态",
       prop: "status",
       cellRenderer: scope => (
         <el-switch
@@ -92,17 +110,23 @@ export function useRole() {
           model-value={scope.row.status}
           active-value={1}
           inactive-value={2}
-          active-text="已启用"
-          inactive-text="已停用"
+          active-text="启用"
+          inactive-text="停用"
           inline-prompt
           style={switchStyle.value}
+          onChange={() => onChange(scope as any)}
+          onClick={() => handleSwitchClick(scope as any)}
         />
       ),
       width: 100
     },
     {
-      label: "注册时间",
-      prop: "registerTime",
+      label: "创建人",
+      prop: "admin_name"
+    },
+    {
+      label: "创建时间",
+      prop: "created_at",
       width: 180
     },
     {
@@ -113,9 +137,74 @@ export function useRole() {
     }
   ];
 
+  function onChange({ row, index }) {}
+  function handleSwitchClick({ row, index }) {
+    // if (!filterBtn("/admin/user/edit")) {
+    //   message("暂无权限", { type: "error" });
+    //   return;
+    // }
+
+    ElMessageBox.confirm(
+      `确认要<strong>${
+        row.status === 1 ? "停用" : "启用"
+      }</strong><strong style='color:var(--el-color-primary)'>${
+        row.name
+      }</strong>吗?`,
+      "系统提示",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+        dangerouslyUseHTMLString: true,
+        draggable: true
+      }
+    ).then(() => {
+      switchLoadMap.value[index] = Object.assign(
+        {},
+        switchLoadMap.value[index],
+        {
+          loading: true
+        }
+      );
+      const copyRow = Object.assign({}, row);
+
+      // getMemberList(copyRow).then(res => {
+      let res: any = {};
+      if (res.code == 0) {
+        switchLoadMap.value[index] = Object.assign(
+          {},
+          switchLoadMap.value[index],
+          {
+            loading: false
+          }
+        );
+        row.status = copyRow.status;
+        message(`已${row.status === 2 ? "停用" : "启用"}${row.name}`, {
+          type: "success"
+        });
+      } else if (res.code == -1) {
+        switchLoadMap.value[index] = Object.assign(
+          {},
+          switchLoadMap.value[index],
+          {
+            loading: false
+          }
+        );
+        message(res.msg, { type: "error" });
+      }
+      // });
+    });
+    // .catch(() => {
+    //   row.status === 1 ? (row.status = 2) : (row.status = 1);
+    // });
+  }
   function handleDelete(row) {
-    message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
-    onSearch(pagination.currentPage);
+    delProductList(row.id).then(res => {
+      if (res.code == 0) {
+        message(`您删除了角色名称为${row.id}的这条数据`, { type: "success" });
+        onSearch(pagination.currentPage);
+      }
+    });
   }
 
   function handleSizeChange(val: number) {
@@ -130,23 +219,119 @@ export function useRole() {
   }
 
   function handleSelectionChange(val) {
-    selectList.value = val;
+    selectList.value = val.map(i => i.id);
   }
 
-  async function onSearch(page = 1) {
+  const batchDel = () => {
+    if (selectList.value.length == 0) {
+      message("请选择要删除的数据", { type: "warning" });
+    } else {
+      ElMessageBox.confirm(
+        "选中数据id为" + selectList.value.join() + "，确认要删除这些数据吗？",
+        "删除提示",
+        {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(() => {
+          handleDelete({ id: selectList.value.join() } as any);
+        })
+        .catch(() => {});
+    }
+  };
+  function openDialog(title = "新增", row = { role: 1, bm: 1 }) {
+    addDialog({
+      width: "70%",
+      /* 自定义表头 */
+      title: title + "角色",
+      /* 自定义内容 */
+      contentRenderer: () => h(editForm, { ref: formRef }),
+      draggable: true,
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      props: {
+        formInline: {
+          higherDeptOptions: cloneDeep(dataList.value),
+          ...row
+        }
+      },
+      /* 自定义底部 */
+      footerButtons: [
+        {
+          label: "提交",
+          size: "large",
+          style: {
+            width: "192px"
+          },
+          type: "primary",
+          btnClick: ({ dialog: { options, index }, button }) => {
+            handleCB(options, index);
+          }
+        },
+        {
+          label: "重置",
+          size: "large",
+          type: "danger",
+          style: {
+            width: "112px",
+            background: "#fff",
+            color: "#F33D3D"
+          },
+          btnClick: ({ dialog: { options, index }, button }) => {
+            handleCB(options, index);
+          }
+        }
+      ]
+    });
+
+    function chores(options: DialogOptions, index: number) {
+      message(`${title}成功`, { type: "success" });
+      closeDialog(options, index);
+      onSearch(); // 刷新表格数据
+    }
+    function handleCB(options: DialogOptions, index: number) {
+      const FormRef = formRef.value.getRef();
+      const curData = options.props.formInline;
+      FormRef.validate(valid => {
+        if (valid) {
+          console.log("curData", curData);
+          // 表单规则校验通过
+          if (title === "新增") {
+            addProductList(curData).then(res => {
+              if (res.code == 0) {
+                chores(options, index);
+              }
+            });
+          } else {
+            editProductList(curData).then(res => {
+              if (res.code == 0) {
+                chores(options, index);
+              }
+            });
+          }
+        }
+      });
+    }
+  }
+  async function onSearch(page = 1, flag?: boolean) {
     loading.value = true;
-    const { is_vip, smrz, type } = form;
-    const { data } = await getMemberList(
+    if (flag) {
+      isSearch.value = true;
+    }
+    const searchDataFn = () => {
+      return isSearch.value ? form : {};
+    };
+
+    const { data } = await getProductList(
       toRaw({
         limit: pagination.pageSize,
         page: page,
-        is_vip,
-        smrz,
-        type,
-        [selectValue.value]: form["keyword"]
+        ...searchDataFn()
       })
     );
-    dataList.value = data.data;
+    dataList.value = data.items;
     pagination.total = data.total || 0;
     pagination.currentPage = page;
 
@@ -155,6 +340,7 @@ export function useRole() {
 
   const resetForm = formEl => {
     if (!formEl) return;
+    isSearch.value = false;
     formEl.resetFields();
     onSearch();
   };
@@ -168,8 +354,9 @@ export function useRole() {
     loading,
     columns,
     dataList,
+    isSearch,
     pagination,
-    drawer,
+    lineList,
     // buttonClass,
     onSearch,
     resetForm,
@@ -178,6 +365,8 @@ export function useRole() {
     handleSizeChange,
     handleCurrentChange,
     handleSelectionChange,
-    exportCheckItem
+    exportCheckItem,
+    batchDel,
+    openDialog
   };
 }
