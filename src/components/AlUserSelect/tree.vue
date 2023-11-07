@@ -33,13 +33,13 @@ const treeRef = ref();
 const treeData = ref([]);
 const isExpand = ref(true);
 const searchValue = ref("");
+// 用于存储选中过的数据
 const highlightMap = ref({});
 const { proxy } = getCurrentInstance();
 const defaultProps = {
   children: "children",
   label: "name"
 };
-const { list } = useUserStoreStoreHook();
 const { treeList } = useOrganizationStoreHook();
 
 const filterNode = (value: string, data: Tree) => {

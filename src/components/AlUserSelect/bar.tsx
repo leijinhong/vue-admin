@@ -18,6 +18,7 @@ export default defineComponent({
   setup(props, { emit }) {
     // 组织id
     const id = ref(-1);
+    // 是否点击重置
     const isReset = ref(false);
 
     function handleChange(event: number) {

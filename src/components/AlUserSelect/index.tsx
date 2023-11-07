@@ -7,6 +7,7 @@ import Bar from "./bar";
 export default defineComponent({
   name: "AlUserSelect",
   props: {
+    // 单选为 number或者null, 多选为数组
     modelValue: [Number, Array],
     title: {
       type: String
@@ -14,10 +15,12 @@ export default defineComponent({
     placeholder: {
       type: String
     },
+    // 单选
     highlightCurrentRow: {
       type: Boolean,
       default: true
     },
+    // 多选，设置多选时需要把单选为false
     selection: {
       type: Boolean,
       default: false

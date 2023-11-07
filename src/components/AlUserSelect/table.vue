@@ -7,7 +7,6 @@ import Refresh from "@iconify-icons/ep/refresh";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useThrottleFn } from "@vueuse/core";
 import { isArray, isObject } from "@pureadmin/utils";
-import { computed } from "vue";
 import { nextTick } from "process";
 
 const props = defineProps<{
@@ -41,12 +40,13 @@ const {
 const handleReset = useThrottleFn(() => {
   resetForm(formRef.value);
   emits("reset", true);
+  // 还需变为false,否者一直true
   setTimeout(() => {
     emits("reset", false);
   }, 400);
 }, 500);
 function handleCurrentChangeRow(event: UserItemType | UserItemType[]) {
-  // 为多选时 点击行也会触发需要过滤
+  // 为多选时 点击行也会触发 需要过滤
   if (isObject(event) && props.selection) return;
 
   if (isArray(event)) {
@@ -62,6 +62,7 @@ watch(
   ([mv, list]) => {
     if (mv != null && list) {
       if (isArray(mv)) {
+        // 需等dom渲染完成在执行`toggleRowSelection`否者无效
         nextTick(() => {
           // 默认多选状态
           const rows = list.filter(i => mv.includes(i.id));
@@ -73,7 +74,7 @@ watch(
           }
         });
       } else {
-        // 为单选选中状态
+        // 为单选默认选中状态
         const item = list.find(i => i.id == mv);
         const { setCurrentRow } = tableRef.value.getTableRef();
         setCurrentRow(item);
