@@ -82,7 +82,8 @@ export function useHook() {
     },
     {
       label: "产品名称",
-      prop: "category_name"
+      prop: "category_name",
+      width: 180
     },
     {
       label: "产品线",
@@ -90,11 +91,13 @@ export function useHook() {
     },
     {
       label: "产品形态",
-      prop: "post"
+      prop: "post",
+      width: 80
     },
     {
       label: "软著名称",
-      prop: "roles"
+      prop: "roles",
+      width: 150
     },
     {
       label: "含税单价（单位：元）",
@@ -122,7 +125,8 @@ export function useHook() {
     },
     {
       label: "创建人",
-      prop: "admin_name"
+      prop: "admin_name",
+      width: 120
     },
     {
       label: "创建时间",

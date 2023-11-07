@@ -1,3 +1,16 @@
+body .reversalIcon {
+  .el-icon {
+    transform: rotateY(180deg);
+  }
+}
+body .importBtn {
+  --el-button-border-color: var(--el-color-primary);
+  --el-button-text-color: var(--el-color-primary);
+  --el-button-hover-border-color: var(--el-color-primary);
+}
+.el-button--danger {
+  --el-button-bg-color: #f33d3d !important;
+}
 .el-form-item__label {
   --el-form-label-font-size: 16px;
   --el-text-color-regular: #666666;
@@ -5,9 +18,9 @@
   height: 42px !important;
   line-height: 42px !important;
 }
-.el-textarea__inner{
+.el-textarea__inner {
   font-size: 16px !important;
-  &::placeholder{
+  &::placeholder {
     color: #999 !important;
   }
 }

@@ -7,9 +7,8 @@ import { useHook } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import CaretBottom from "@/assets/svg/caret_bottom.svg?component";
+import AlImport from "@/components/AlImport";
 
-// import Database from "@iconify-icons/ri/database-2-line";
-// import More from "@iconify-icons/ep/more-filled";
 import Delete from "@iconify-icons/ep/delete";
 import EditPen from "@iconify-icons/ep/edit-pen";
 import Search from "@iconify-icons/ep/search";
@@ -21,6 +20,7 @@ defineOptions({
 });
 
 const formRef = ref();
+const importActive = ref(false);
 
 const {
   form,
@@ -170,9 +170,9 @@ onMounted(() => {
                 --el-font-size-base: 16px;
                 height: var(--el-component-size);
               "
-              type="success"
-              :icon="useRenderIcon(AddFill)"
-              @click="exportCheckItem"
+              class="importBtn reversalIcon"
+              :icon="useRenderIcon('tdesign:file-export')"
+              @click="importActive = true"
             >
               导入
             </el-button>
@@ -184,8 +184,8 @@ onMounted(() => {
                 --el-font-size-base: 16px;
                 height: var(--el-component-size);
               "
-              type="success"
-              :icon="useRenderIcon(AddFill)"
+              class="importBtn"
+              :icon="useRenderIcon('tdesign:file-export')"
               @click="exportCheckItem"
             >
               导出
@@ -248,6 +248,8 @@ onMounted(() => {
         </pure-table>
       </template>
     </PureTableBar>
+
+    <al-import v-model="importActive"></al-import>
   </div>
 </template>
 
